@@ -1,0 +1,187 @@
+<div class="login-page">
+  <!-- BG Grid -->
+  <div class="login-bg">
+    <div class="bg-grid"></div>
+    <div class="bg-cross c1"></div>
+    <div class="bg-cross c2"></div>
+    <div class="bg-cross c3"></div>
+  </div>
+
+  <div class="login-wrap">
+    <!-- LEFT PANEL -->
+    <div class="login-left">
+      <div class="ll-content">
+        <div class="ll-logo">
+          <span class="ll-icon anim-float">⚡</span>
+          <span class="ll-name">NEON<span>MARKET</span></span>
+        </div>
+        <h1 class="ll-headline">La tienda del<br/><span class="neon-cyan">FUTURO</span><br/>está aquí</h1>
+        <p class="ll-desc">Tecnología, gaming y más. Los mejores precios con envío express a toda Colombia.</p>
+
+        <div class="ll-stats">
+          <div class="ll-stat" *ngFor="let s of stats">
+            <div class="stat-v neon-cyan">{{ s.value }}</div>
+            <div class="stat-l">{{ s.label }}</div>
+          </div>
+        </div>
+
+        <div class="ll-badge">
+          <span>🛡️</span>
+          <div>
+            <strong>Compra 100% Segura</strong>
+            <p>SSL · Pago encriptado · Garantía 12 meses</p>
+          </div>
+        </div>
+
+        <!-- Quick login buttons -->
+        <div class="ll-quick">
+          <p class="quick-label">— Acceso rápido demo —</p>
+          <div class="quick-btns">
+            <button class="btn btn-outline-magenta btn-sm" (click)="loginAsAdmin()">
+              👑 Admin Demo
+            </button>
+            <button class="btn btn-outline-cyan btn-sm" (click)="loginAsClient()">
+              👤 Cliente Demo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="login-right">
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab" [class.active]="activeTab==='login'"    (click)="activeTab='login'">    Ingresar    </button>
+        <button class="auth-tab" [class.active]="activeTab==='register'" (click)="activeTab='register'"> Registrarse </button>
+        <div class="tab-bar" [style.left]="activeTab==='login' ? '4px' : 'calc(50% + 2px)'"></div>
+      </div>
+
+      <!-- ===== LOGIN FORM ===== -->
+      <form *ngIf="activeTab==='login'" class="auth-form" (ngSubmit)="login()" [@formAnim]>
+        <div class="form-head">
+          <h2>Bienvenido</h2>
+          <p>Ingresa a tu cuenta</p>
+        </div>
+
+        <div class="form-group">
+          <label>Correo</label>
+          <div class="input-wrap">
+            <span class="inp-icon">📧</span>
+            <input class="input" type="email" placeholder="correo@ejemplo.com"
+                   [(ngModel)]="loginEmail" name="email" autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Contraseña</label>
+          <div class="input-wrap">
+            <span class="inp-icon">🔒</span>
+            <input class="input" [type]="showPassword ? 'text' : 'password'"
+                   placeholder="Tu contraseña"
+                   [(ngModel)]="loginPassword" name="password" autocomplete="current-password" />
+            <button type="button" class="eye-btn" (click)="showPassword = !showPassword">
+              {{ showPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="check-label">
+            <input type="checkbox" [(ngModel)]="rememberMe" name="remember" />
+            Recordarme
+          </label>
+          <a class="forgot-link" (click)="forgotPassword()">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <div class="error-msg" *ngIf="loginError" [@shake]>⚠️ {{ loginError }}</div>
+
+        <button type="submit" class="btn btn-cyan w-full btn-lg" [disabled]="isLoading()">
+          <span *ngIf="!isLoading()">⚡ Ingresar</span>
+          <span *ngIf="isLoading()" class="loader-dots"><span></span><span></span><span></span></span>
+        </button>
+
+        <div class="form-divider"><span>o usa acceso rápido</span></div>
+
+        <div class="quick-row">
+          <button type="button" class="btn btn-outline-magenta w-full" (click)="loginAsAdmin()">
+            👑 Entrar como Admin
+          </button>
+          <button type="button" class="btn btn-ghost w-full" (click)="loginAsClient()">
+            👤 Entrar como Cliente
+          </button>
+        </div>
+
+        <p class="form-footer">¿No tienes cuenta?
+          <a (click)="activeTab='register'">Regístrate gratis</a>
+        </p>
+      </form>
+
+      <!-- ===== REGISTER FORM ===== -->
+      <form *ngIf="activeTab==='register'" class="auth-form" (ngSubmit)="register()" [@formAnim]>
+        <div class="form-head">
+          <h2>Crear Cuenta</h2>
+          <p>Únete a NeonMarket</p>
+        </div>
+
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <div class="input-wrap">
+            <span class="inp-icon">👤</span>
+            <input class="input" type="text" placeholder="Tu nombre" [(ngModel)]="regName" name="name" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <div class="input-wrap">
+            <span class="inp-icon">📧</span>
+            <input class="input" type="email" placeholder="correo@ejemplo.com" [(ngModel)]="regEmail" name="email" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Contraseña</label>
+          <div class="input-wrap">
+            <span class="inp-icon">🔒</span>
+            <input class="input" [type]="showPassword ? 'text' : 'password'"
+                   placeholder="Mínimo 8 caracteres" [(ngModel)]="regPassword" name="password" required />
+            <button type="button" class="eye-btn" (click)="showPassword = !showPassword">
+              {{ showPassword ? '🙈' : '👁️' }}
+            </button>
+          </div>
+          <!-- Strength bar -->
+          <div class="strength-bar" *ngIf="regPassword">
+            <div class="strength-fill" [style.width]="passwordStrength.pct + '%'" [style.background]="passwordStrength.color"></div>
+          </div>
+          <small *ngIf="regPassword" [style.color]="passwordStrength.color">{{ passwordStrength.label }}</small>
+        </div>
+
+        <div class="form-group">
+          <label>Confirmar contraseña</label>
+          <div class="input-wrap">
+            <span class="inp-icon">🔒</span>
+            <input class="input" [type]="showPassword ? 'text' : 'password'"
+                   placeholder="Repite la contraseña" [(ngModel)]="regConfirm" name="confirm" required />
+          </div>
+        </div>
+
+        <label class="check-label">
+          <input type="checkbox" [(ngModel)]="acceptTerms" name="terms" />
+          Acepto los <a href="#">términos y condiciones</a>
+        </label>
+
+        <div class="error-msg" *ngIf="registerError" [@shake]>⚠️ {{ registerError }}</div>
+
+        <button type="submit" class="btn btn-magenta w-full btn-lg" [disabled]="isLoading()">
+          <span *ngIf="!isLoading()">🚀 Crear Cuenta</span>
+          <span *ngIf="isLoading()" class="loader-dots"><span></span><span></span><span></span></span>
+        </button>
+
+        <p class="form-footer">¿Ya tienes cuenta?
+          <a (click)="activeTab='login'">Inicia sesión</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,92 @@
+<!-- NAVBAR -->
+<header class="navbar" [class.scrolled]="scrolled()">
+  <div class="nb-inner">
+
+    <!-- Logo -->
+    <a routerLink="/home" class="nb-logo">
+      <span class="logo-icon">⚡</span>
+      <span class="logo-text">NEON<span>MARKET</span></span>
+    </a>
+
+    <!-- Search -->
+    <div class="nb-search">
+      <span class="search-icon">🔍</span>
+      <input
+        class="search-input"
+        type="text"
+        placeholder="Buscar productos, marcas..."
+        [(ngModel)]="searchQuery"
+        (input)="search()"
+        (keyup.enter)="search()"
+      />
+      <button *ngIf="searchQuery" class="search-clear" (click)="clearSearch()">✕</button>
+    </div>
+
+    <!-- Right actions -->
+    <nav class="nb-actions" *ngIf="auth.isLoggedIn()">
+
+      <!-- Categories -->
+      <div class="nb-dropdown">
+        <button class="nb-link">Categorías ▾</button>
+        <div class="nb-dropdown-menu">
+          <a *ngFor="let cat of products.categories" class="dd-item"
+             (click)="products.setCategory(cat); mobileOpen.set(false)"
+             routerLink="/home">
+            {{ cat === 'all' ? '🌐 Todos' : cat }}
+          </a>
+        </div>
+      </div>
+
+      <a routerLink="/home" class="nb-link">Tienda</a>
+      <a routerLink="/history" class="nb-link">Mis Pedidos</a>
+      <a *ngIf="auth.isAdmin()" routerLink="/admin" class="nb-link neon-magenta">Admin</a>
+
+      <!-- Cart -->
+      <button class="nb-cart-btn" (click)="cart.toggleCart()">
+        🛒
+        <span class="cart-badge" *ngIf="cart.count() > 0">{{ cart.count() }}</span>
+      </button>
+
+      <!-- User menu -->
+      <div class="nb-dropdown">
+        <button class="nb-user-btn">
+          <!-- <span class="user-avatar">{{ auth.user()?.name?.charAt(0) }}</span>   -->
+          <!--  <span class="user-name">{{ auth.user()?.name?.split(' ')[0] }}</span>   -->
+          <span class="user-avatar">{{ userInitial }}</span>
+          <span class="user-name">{{ userFirstName }}</span>
+
+        </button>
+        <div class="nb-dropdown-menu align-right">
+          <div class="dd-header">
+            <span class="dd-name">{{ auth.user()?.name }}</span>
+            <span class="badge badge-{{ auth.isAdmin() ? 'magenta' : 'cyan' }}">
+              {{ auth.isAdmin() ? 'Admin' : 'Cliente' }}
+            </span>
+          </div>
+          <div class="dd-divider"></div>
+          <a routerLink="/history" class="dd-item">📦 Mis Pedidos</a>
+          <a routerLink="/history" class="dd-item">❤️ Favoritos</a>
+          <a *ngIf="auth.isAdmin()" routerLink="/admin" class="dd-item">⚙️ Panel Admin</a>
+          <div class="dd-divider"></div>
+          <button class="dd-item dd-logout" (click)="logout()">🚪 Cerrar Sesión</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Mobile hamburger -->
+    <button class="nb-hamburger" (click)="toggleMobile()" *ngIf="auth.isLoggedIn()">
+      <span [class.open]="mobileOpen()"></span>
+      <span [class.open]="mobileOpen()"></span>
+      <span [class.open]="mobileOpen()"></span>
+    </button>
+  </div>
+
+  <!-- Mobile menu -->
+  <div class="nb-mobile" *ngIf="mobileOpen() && auth.isLoggedIn()">
+    <a routerLink="/home" class="mob-link" (click)="mobileOpen.set(false)">Tienda</a>
+    <a routerLink="/history" class="mob-link" (click)="mobileOpen.set(false)">Mis Pedidos</a>
+    <a *ngIf="auth.isAdmin()" routerLink="/admin" class="mob-link" (click)="mobileOpen.set(false)">Admin</a>
+    <button class="mob-link mob-logout" (click)="logout(); mobileOpen.set(false)">Cerrar Sesión</button>
+  </div>
+</header>
+<div class="nb-spacer"></div>

@@ -1,0 +1,65 @@
+<div class="pc" [class.out-of-stock]="product.stock === 0">
+
+  <!-- Badges -->
+  <div class="pc-badges">
+    <span class="badge badge-magenta" *ngIf="product.isHot">🔥 HOT</span>
+    <span class="badge badge-cyan"    *ngIf="product.isNew">✨ NEW</span>
+    <span class="badge badge-red"     *ngIf="discount > 0">-{{ discount }}%</span>
+  </div>
+
+  <!-- Wishlist -->
+  <button class="pc-wish" (click)="onWishlist()" [class.active]="wishlisted" title="Favoritos">
+    {{ wishlisted ? '❤️' : '🤍' }}
+  </button>
+
+  <!-- Image -->
+  <div class="pc-img-wrap" (click)="quickView.emit(product)">
+    <img [src]="product.image" [alt]="product.name" class="pc-img" loading="lazy" />
+    <div class="pc-overlay">
+      <button class="pc-quick">👁 Vista Rápida</button>
+    </div>
+    <div class="pc-stock-overlay" *ngIf="product.stock === 0">SIN STOCK</div>
+  </div>
+
+  <!-- Body -->
+  <div class="pc-body">
+    <span class="pc-category">{{ product.category }}</span>
+    <h3 class="pc-name">{{ product.name }}</h3>
+
+    <!-- Rating -->
+    <div class="pc-rating">
+      <span class="stars">
+        <span *ngFor="let s of stars" [class.filled]="s === '★'">{{ s }}</span>
+      </span>
+      <span class="rating-val">{{ product.rating }}</span>
+      <span class="rating-count">({{ product.reviews }})</span>
+    </div>
+
+    <!-- Tags -->
+    <div class="pc-tags" *ngIf="product.tags?.length">
+      <span class="pc-tag" *ngFor="let t of product.tags">{{ t }}</span>
+    </div>
+
+    <!-- Price -->
+    <div class="pc-price-row">
+      <span class="pc-price">{{ formatPrice(product.price) }}</span>
+      <span class="pc-original" *ngIf="product.originalPrice">{{ formatPrice(product.originalPrice) }}</span>
+    </div>
+
+    <!-- Stock indicator -->
+    <div class="pc-stock" *ngIf="product.stock > 0 && product.stock <= 5">
+      <span class="stock-dot"></span> ¡Solo {{ product.stock }} disponibles!
+    </div>
+
+    <!-- Add to cart -->
+    <button
+      class="pc-add-btn"
+      [class.added]="added"
+      [disabled]="product.stock === 0"
+      (click)="onAdd()"
+    >
+      <span *ngIf="!added">🛒 Agregar al Carrito</span>
+      <span *ngIf="added">✅ ¡Agregado!</span>
+    </button>
+  </div>
+</div>

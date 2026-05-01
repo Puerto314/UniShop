@@ -1,0 +1,150 @@
+<div class="admin-page" *ngIf="auth.isAdmin(); else noAccess">
+  <div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="as-logo">⚙️ <span>ADMIN</span></div>
+      <nav class="as-nav">
+        <button class="as-link" [class.active]="activeTab()==='dashboard'" (click)="activeTab.set('dashboard')">
+          📊 Dashboard
+        </button>
+        <button class="as-link" [class.active]="activeTab()==='products'" (click)="activeTab.set('products')">
+          📦 Productos
+        </button>
+        <button class="as-link" [class.active]="activeTab()==='orders'" (click)="activeTab.set('orders')">
+          🧾 Pedidos
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="admin-main">
+
+      <!-- DASHBOARD -->
+      <div *ngIf="activeTab()==='dashboard'">
+        <h2 class="admin-title">DASHBOARD</h2>
+        <div class="kpi-grid">
+          <div class="kpi-card kpi-cyan">
+            <div class="kpi-icon">💰</div>
+            <div class="kpi-val neon-cyan">{{ formatPrice(totalRevenue) }}</div>
+            <div class="kpi-label">Ingresos Totales</div>
+          </div>
+          <div class="kpi-card kpi-magenta">
+            <div class="kpi-icon">🧾</div>
+            <div class="kpi-val neon-magenta">{{ totalOrders }}</div>
+            <div class="kpi-label">Pedidos</div>
+          </div>
+          <div class="kpi-card kpi-yellow">
+            <div class="kpi-icon">📦</div>
+            <div class="kpi-val neon-yellow">{{ totalProducts }}</div>
+            <div class="kpi-label">Productos</div>
+          </div>
+          <div class="kpi-card kpi-green">
+            <div class="kpi-icon">⭐</div>
+            <div class="kpi-val neon-green">{{ avgRating }}</div>
+            <div class="kpi-label">Rating Promedio</div>
+          </div>
+        </div>
+
+        <h3 class="admin-subtitle">Últimos Pedidos</h3>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>ID</th><th>Fecha</th><th>Total</th><th>Estado</th><th>Acción</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let o of orders.orders()">
+                <td class="mono neon-cyan">{{ o.id }}</td>
+                <td>{{ formatDate(o.date) }}</td>
+                <td class="mono">{{ formatPrice(o.total) }}</td>
+                <td>
+                  <span class="status-badge"
+                        [style.color]="orders.statusColor(o.status)"
+                        [style.border-color]="orders.statusColor(o.status)">
+                    {{ orders.statusLabel(o.status) }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-ghost btn-sm" (click)="changeStatus(o.id)">✏️ Editar</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div *ngIf="activeTab()==='products'">
+        <div class="admin-toolbar">
+          <h2 class="admin-title">PRODUCTOS</h2>
+          <button class="btn btn-cyan btn-sm">+ Nuevo Producto</button>
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>ID</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Rating</th><th>Acciones</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let p of products.PRODUCTS">
+                <td class="mono">{{ p.id }}</td>
+                <td>
+                  <span class="p-name">{{ p.name }}</span>
+                  <span class="badge badge-magenta ml-4" *ngIf="p.isHot">HOT</span>
+                  <span class="badge badge-cyan ml-4"    *ngIf="p.isNew">NEW</span>
+                </td>
+                <td class="mono">{{ p.category }}</td>
+                <td class="mono neon-cyan">{{ formatPrice(p.price) }}</td>
+                <td>
+                  <span [class.neon-yellow]="p.stock<=5" [class.neon-red]="p.stock===0">{{ p.stock }}</span>
+                </td>
+                <td class="neon-yellow mono">{{ p.rating }}★</td>
+                <td>
+                  <div class="act-btns">
+                    <button class="btn btn-ghost btn-sm">✏️</button>
+                    <button class="btn btn-ghost btn-sm" style="color:var(--red)">🗑</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div *ngIf="activeTab()==='orders'">
+        <h2 class="admin-title">GESTIÓN DE PEDIDOS</h2>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr><th>ID</th><th>Fecha</th><th>Items</th><th>Total</th><th>Estado</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let o of orders.orders()">
+                <td class="mono neon-cyan">{{ o.id }}</td>
+                <td>{{ formatDate(o.date) }}</td>
+                <td class="mono">{{ o.items.length }} item(s)</td>
+                <td class="mono neon-yellow">{{ formatPrice(o.total) }}</td>
+                <td>
+                  <span class="status-badge"
+                        [style.color]="orders.statusColor(o.status)"
+                        [style.border-color]="orders.statusColor(o.status)">
+                    {{ orders.statusLabel(o.status) }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<ng-template #noAccess>
+  <div class="no-access">
+    <div class="anim-float" style="font-size:5rem">🔒</div>
+    <h2>Acceso Restringido</h2>
+    <p>Esta sección es solo para administradores.</p>
+  </div>
+</ng-template>

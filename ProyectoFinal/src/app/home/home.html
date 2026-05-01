@@ -1,0 +1,196 @@
+<div class="home-page">
+
+  <!-- ======= TICKER ======= -->
+  <div class="ticker-bar">
+    <div class="ticker-track">
+      <span *ngFor="let _ of [1,2,3,4]">
+        ⚡ ENVÍO GRATIS en compras +$150.000 &nbsp;|&nbsp;
+        🔥 RTX 5070 Ti disponible &nbsp;|&nbsp;
+        ✨ Cupón NEON10: 10% OFF &nbsp;|&nbsp;
+        🛡️ Garantía 12 meses &nbsp;|&nbsp;
+      </span>
+    </div>
+  </div>
+
+  <!-- ======= HERO CAROUSEL ======= -->
+  <section class="hero-section">
+    <div class="hero-slide" *ngFor="let b of heroBanners; let i = index"
+         [class.active]="i === carouselIdx()"
+         [style.border-color]="b.color">
+      <div class="hs-content">
+        <span class="hs-tag" [style.color]="b.color" [style.border-color]="b.color">{{ b.tag }}</span>
+        <h1 class="hs-title" [style.color]="b.color">{{ b.title }}</h1>
+        <p class="hs-sub">{{ b.sub }}</p>
+        <button class="btn btn-lg" [style.background]="b.color"
+                [style.color]="b.color === 'var(--yellow)' ? 'var(--black)' : 'var(--white)'"
+                (click)="cart.openCart()">
+          {{ b.cta }} →
+        </button>
+      </div>
+      <div class="hs-emoji">{{ b.img }}</div>
+    </div>
+
+    <!-- Controls -->
+    <button class="hero-arrow left"  (click)="prevSlide()">❮</button>
+    <button class="hero-arrow right" (click)="nextSlide()">❯</button>
+    <div class="hero-dots">
+      <button *ngFor="let b of heroBanners; let i = index"
+              class="hero-dot" [class.active]="i === carouselIdx()"
+              (click)="carouselIdx.set(i)"></button>
+    </div>
+  </section>
+
+  <!-- ======= CATEGORY PILLS ======= -->
+  <section class="cat-section">
+    <div class="container">
+      <div class="cat-row">
+        <button
+          *ngFor="let cat of products.categories"
+          class="cat-pill"
+          [class.active]="products.activeCategory() === cat"
+          (click)="products.setCategory(cat)"
+        >
+          {{ catIcon[cat] }} {{ cat === 'all' ? 'Todos' : cat }}
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= MAIN CONTENT ======= -->
+  <section class="content-section">
+    <div class="container">
+
+      <!-- Toolbar -->
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <h2 class="section-title">
+            <span class="neon-cyan">{{ products.activeCategory() === 'all' ? 'TODOS LOS PRODUCTOS' : products.activeCategory().toUpperCase() }}</span>
+            <span class="product-count">({{ sortedProducts().length }})</span>
+          </h2>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-ghost btn-sm" (click)="showFilters.update(v=>!v)">
+            ⚙️ Filtros
+          </button>
+          <select class="sort-select" [(ngModel)]="sortBy" [ngModel]="sortBy()" (ngModelChange)="sortBy.set($event)">
+            <option value="default">Relevancia</option>
+            <option value="price-asc">Precio: menor a mayor</option>
+            <option value="price-desc">Precio: mayor a menor</option>
+            <option value="rating">Mejor calificados</option>
+            <option value="newest">Lo más nuevo</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Filters panel -->
+      <div class="filters-panel" *ngIf="showFilters()">
+        <div class="filter-group">
+          <label>Precio máximo: {{ formatPrice(priceMax()) }}</label>
+          <input type="range" min="50000" max="3500000" step="50000"
+                 [value]="priceMax()" (input)="priceMax.set(+$any($event.target).value)"
+                 class="range-input" />
+        </div>
+        <div class="filter-group">
+          <label>Solo destacados</label>
+          <div class="filter-badges">
+            <button class="badge badge-magenta cursor-pointer" (click)="products.setSearch('hot')">🔥 HOT</button>
+            <button class="badge badge-cyan cursor-pointer"    (click)="products.setSearch('new')">✨ NEW</button>
+            <button class="badge badge-green cursor-pointer"   (click)="products.setSearch('')">Todos</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" [@staggerGrid]="sortedProducts().length">
+        <app-product-card
+          *ngFor="let p of sortedProducts(); trackBy: trackFn"
+          [product]="p"
+          (addToCart)="onAddToCart($event)"
+          (quickView)="onQuickView($event)"
+          (addWishlist)="onWishlist($event)"
+        ></app-product-card>
+      </div>
+
+      <!-- Empty state -->
+      <div class="empty-state" *ngIf="!sortedProducts().length">
+        <div class="es-icon anim-float">🔍</div>
+        <h3>Sin resultados</h3>
+        <p>No encontramos productos que coincidan con tu búsqueda.</p>
+        <button class="btn btn-outline-cyan" (click)="products.setSearch(''); products.setCategory('all')">
+          Ver todos los productos
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======= PROMO BANNERS ======= -->
+  <section class="promo-section">
+    <div class="container">
+      <div class="promo-grid">
+        <div class="promo-card promo-cyan">
+          <div class="promo-icon">🚀</div>
+          <h3>Envío Express</h3>
+          <p>Recibe en 24h en Bogotá, Medellín y Cali</p>
+        </div>
+        <div class="promo-card promo-magenta">
+          <div class="promo-icon">🛡️</div>
+          <h3>Garantía Total</h3>
+          <p>12 meses de garantía en todos los productos</p>
+        </div>
+        <div class="promo-card promo-yellow">
+          <div class="promo-icon">💳</div>
+          <h3>Cuotas sin interés</h3>
+          <p>Hasta 36 cuotas con Tarjeta de Crédito</p>
+        </div>
+        <div class="promo-card promo-green">
+          <div class="promo-icon">🎮</div>
+          <h3>Programa Gamer</h3>
+          <p>Acumula puntos y canjéalos por descuentos</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ======= QUICK VIEW MODAL ======= -->
+<div class="qv-overlay" *ngIf="quickViewProduct()" (click)="closeQuickView()">
+  <div class="qv-modal" (click)="$event.stopPropagation()">
+    <button class="qv-close" (click)="closeQuickView()">✕</button>
+    <ng-container *ngIf="quickViewProduct() as p">
+      <div class="qv-img-side">
+        <img [src]="p.image" [alt]="p.name" />
+        <div class="qv-badges">
+          <span class="badge badge-magenta" *ngIf="p.isHot">🔥 HOT</span>
+          <span class="badge badge-cyan"    *ngIf="p.isNew">✨ NEW</span>
+        </div>
+      </div>
+      <div class="qv-info">
+        <span class="qv-cat">{{ p.category }}</span>
+        <h2 class="qv-name">{{ p.name }}</h2>
+        <div class="qv-rating">
+          <span *ngFor="let s of [1,2,3,4,5]" class="star" [class.on]="s <= p.rating">★</span>
+          <span class="rating-val neon-yellow">{{ p.rating }}</span>
+          <span style="color:var(--gray)">({{ p.reviews }} reseñas)</span>
+        </div>
+        <div class="qv-price-row">
+          <span class="qv-price neon-cyan">{{ formatPrice(p.price) }}</span>
+          <span class="qv-orig" *ngIf="p.originalPrice">{{ formatPrice(p.originalPrice) }}</span>
+          <span class="badge badge-red" *ngIf="discount(p)">-{{ discount(p) }}%</span>
+        </div>
+        <div class="qv-tags" *ngIf="p.tags?.length">
+          <span class="pc-tag" *ngFor="let t of p.tags">{{ t }}</span>
+        </div>
+        <div class="qv-stock">
+          <span class="stock-dot" [style.background]="p.stock > 5 ? 'var(--green)' : 'var(--yellow)'"></span>
+          <span [style.color]="p.stock > 5 ? 'var(--green)' : 'var(--yellow)'">
+            {{ p.stock > 0 ? (p.stock > 5 ? 'En stock' : 'Solo ' + p.stock + ' disponibles') : 'Sin stock' }}
+          </span>
+        </div>
+        <button class="btn btn-cyan w-full btn-lg" [disabled]="p.stock === 0" (click)="addQuickViewToCart()">
+          🛒 Agregar al Carrito
+        </button>
+      </div>
+    </ng-container>
+  </div>
+</div>

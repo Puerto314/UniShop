@@ -1,0 +1,133 @@
+.pc {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  display: flex; flex-direction: column;
+  overflow: hidden; position: relative;
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+.pc:hover {
+  border-color: var(--cyan);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 32px rgba(0,245,255,.12);
+}
+.pc.out-of-stock { opacity: .55; }
+
+/* Badges */
+.pc-badges {
+  position: absolute; top: 10px; left: 10px;
+  display: flex; flex-direction: column; gap: 4px; z-index: 2;
+}
+
+/* Wishlist */
+.pc-wish {
+  position: absolute; top: 10px; right: 10px; z-index: 2;
+  background: rgba(10,10,10,.7); border: 1px solid var(--border);
+  border-radius: 50%; width: 32px; height: 32px;
+  cursor: pointer; font-size: .95rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: transform .2s, background .2s;
+}
+.pc-wish:hover, .pc-wish.active { transform: scale(1.2); background: rgba(255,0,110,.15); }
+
+/* Image */
+.pc-img-wrap {
+  position: relative; overflow: hidden; cursor: pointer;
+  background: var(--dark); height: 200px;
+}
+.pc-img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: transform .4s ease;
+}
+.pc:hover .pc-img { transform: scale(1.06); }
+.pc-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,.5);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity .2s;
+}
+.pc:hover .pc-overlay { opacity: 1; }
+.pc-quick {
+  background: var(--cyan); color: var(--black);
+  border: none; border-radius: var(--radius);
+  font-family: var(--font-display); font-size: 1rem;
+  padding: 8px 20px; cursor: pointer; letter-spacing: .06em;
+  transform: translateY(10px); transition: transform .2s, box-shadow .2s;
+}
+.pc:hover .pc-quick { transform: translateY(0); }
+.pc-quick:hover { box-shadow: 0 0 20px rgba(0,245,255,.6); }
+.pc-stock-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,.7);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 1.5rem;
+  color: var(--red); letter-spacing: .1em;
+}
+
+/* Body */
+.pc-body { padding: 14px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+.pc-category {
+  font-family: var(--font-mono); font-size: .7rem;
+  color: var(--cyan); text-transform: uppercase; letter-spacing: .1em;
+}
+.pc-name {
+  font-family: var(--font-body); font-weight: 700;
+  font-size: 1rem; line-height: 1.3; color: var(--white);
+}
+
+/* Rating */
+.pc-rating { display: flex; align-items: center; gap: 6px; }
+.stars { display: flex; gap: 1px; }
+.stars span { font-size: .85rem; color: var(--border); }
+.stars span.filled { color: var(--yellow); }
+.rating-val { font-family: var(--font-mono); font-size: .8rem; color: var(--yellow); }
+.rating-count { font-size: .75rem; color: var(--gray); }
+
+/* Tags */
+.pc-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.pc-tag {
+  font-family: var(--font-mono); font-size: .65rem;
+  background: rgba(255,255,255,.05); border: 1px solid var(--border);
+  color: var(--gray); padding: 2px 6px; border-radius: 2px;
+}
+
+/* Price */
+.pc-price-row { display: flex; align-items: baseline; gap: 8px; margin-top: 4px; }
+.pc-price {
+  font-family: var(--font-display); font-size: 1.4rem;
+  color: var(--cyan); letter-spacing: .04em;
+}
+.pc-original {
+  font-size: .85rem; color: var(--gray);
+  text-decoration: line-through;
+}
+
+/* Stock */
+.pc-stock {
+  display: flex; align-items: center; gap: 6px;
+  font-size: .78rem; color: var(--yellow); font-family: var(--font-mono);
+}
+.stock-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--yellow); animation: pulse 1.2s ease-in-out infinite;
+}
+
+/* Add button */
+.pc-add-btn {
+  margin-top: auto;
+  width: 100%; padding: 10px;
+  background: transparent; border: 1.5px solid var(--cyan);
+  color: var(--cyan); font-family: var(--font-display);
+  font-size: 1rem; letter-spacing: .06em; border-radius: var(--radius);
+  cursor: pointer; transition: all .2s;
+}
+.pc-add-btn:hover:not(:disabled) {
+  background: var(--cyan); color: var(--black);
+  box-shadow: 0 0 18px rgba(0,245,255,.4);
+}
+.pc-add-btn:disabled {
+  border-color: var(--border); color: var(--gray); cursor: not-allowed;
+}
+.pc-add-btn.added {
+  border-color: var(--green); color: var(--green);
+  background: rgba(0,255,136,.1);
+  animation: neonPulse 1s ease;
+}

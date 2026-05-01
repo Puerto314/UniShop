@@ -1,0 +1,51 @@
+<div class="history-page">
+  <div class="container">
+    <div class="page-header">
+      <h1>MIS <span class="neon-cyan">PEDIDOS</span></h1>
+      <p class="page-sub">Historial completo de tus compras</p>
+    </div>
+
+    <div class="orders-list" *ngIf="orderService.orders().length; else empty">
+      <div class="order-card card" *ngFor="let order of orderService.orders()">
+        <div class="oc-header">
+          <div class="oc-id">
+            <span class="font-mono neon-cyan">#{{ order.id }}</span>
+            <span class="oc-date">{{ formatDate(order.date) }}</span>
+          </div>
+          <div class="oc-status-wrap">
+            <span class="oc-status"
+                  [style.color]="orderService.statusColor(order.status)"
+                  [style.border-color]="orderService.statusColor(order.status)">
+              {{ orderService.statusLabel(order.status) }}
+            </span>
+          </div>
+        </div>
+        <div class="oc-items">
+          <div class="oc-item" *ngFor="let item of order.items">
+            <span class="oci-name">{{ item.product.name }}</span>
+            <span class="oci-qty">x{{ item.qty }}</span>
+            <span class="oci-price">{{ formatPrice(item.product.price * item.qty) }}</span>
+          </div>
+        </div>
+        <div class="oc-footer">
+          <div class="oc-total">
+            TOTAL: <span class="neon-cyan">{{ formatPrice(order.total) }}</span>
+          </div>
+          <div class="oc-actions">
+            <button class="btn btn-ghost btn-sm">🧾 Factura</button>
+            <button class="btn btn-outline-cyan btn-sm" (click)="reorder(order.id)">🔄 Reordenar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #empty>
+      <div class="empty-state">
+        <div class="es-icon anim-float">📦</div>
+        <h3>Sin pedidos</h3>
+        <p>Aún no has realizado ninguna compra.</p>
+        <a routerLink="/home" class="btn btn-cyan mt-16">Ir a la Tienda</a>
+      </div>
+    </ng-template>
+  </div>
+</div>

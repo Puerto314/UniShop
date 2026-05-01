@@ -1,0 +1,92 @@
+<!-- Overlay -->
+<div class="cart-overlay" *ngIf="cartService.isOpen()" (click)="cartService.closeCart()"></div>
+
+<!-- Drawer -->
+<aside class="cart-drawer" *ngIf="cartService.isOpen()" [@drawerAnim]>
+
+  <!-- Header -->
+  <div class="cd-header">
+    <div class="cd-title">
+      <span>🛒</span>
+      <span>CARRITO</span>
+      <span class="cd-count" *ngIf="cartService.count() > 0">{{ cartService.count() }}</span>
+    </div>
+    <button class="cd-close" (click)="cartService.closeCart()">✕</button>
+  </div>
+
+  <!-- Empty -->
+  <div class="cd-empty" *ngIf="!cartService.items().length">
+    <div class="empty-icon anim-float">🛒</div>
+    <p>Tu carrito está vacío</p>
+    <small>Agrega productos desde la tienda</small>
+    <button class="btn btn-outline-cyan btn-sm mt-16" (click)="cartService.closeCart()">
+      Ir a la Tienda
+    </button>
+  </div>
+
+  <!-- Items -->
+  <div class="cd-items" *ngIf="cartService.items().length">
+    <div class="cd-item" *ngFor="let item of cartService.items()" [@itemAnim]>
+      <img [src]="item.product.image" [alt]="item.product.name" class="ci-img" />
+      <div class="ci-info">
+        <p class="ci-name">{{ item.product.name }}</p>
+        <p class="ci-price">{{ formatPrice(item.product.price) }}</p>
+        <div class="ci-qty">
+          <button class="qty-btn" (click)="cartService.updateQty(item.product.id, item.qty - 1)">−</button>
+          <span class="qty-val">{{ item.qty }}</span>
+          <button class="qty-btn" (click)="cartService.updateQty(item.product.id, item.qty + 1)">+</button>
+        </div>
+      </div>
+      <div class="ci-right">
+        <p class="ci-total">{{ formatPrice(item.product.price * item.qty) }}</p>
+        <button class="ci-remove" (click)="cartService.remove(item.product.id)" title="Eliminar">🗑</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="cd-footer" *ngIf="cartService.items().length">
+
+    <!-- Coupon -->
+    <div class="cd-coupon">
+      <input class="input" [(ngModel)]="couponCode" placeholder="Código de cupón (NEON10)" (keyup.enter)="applyCoupon()" />
+      <button class="btn btn-yellow btn-sm" (click)="applyCoupon()">Aplicar</button>
+    </div>
+
+    <!-- Totals -->
+    <div class="cd-totals">
+      <div class="total-row">
+        <span>Subtotal</span>
+        <span>{{ formatPrice(cartService.subtotal()) }}</span>
+      </div>
+      <div class="total-row discount" *ngIf="cartService.discount() > 0">
+        <span>Descuento ({{ cartService.discount() * 100 | number:'1.0-0' }}%)</span>
+        <span>-{{ formatPrice(cartService.subtotal() - cartService.total()) }}</span>
+      </div>
+      <div class="total-row shipping">
+        <span>Envío</span>
+        <span class="neon-green">GRATIS</span>
+      </div>
+      <div class="divider"></div>
+      <div class="total-row grand">
+        <span>TOTAL</span>
+        <span class="neon-cyan">{{ formatPrice(cartService.total()) }}</span>
+      </div>
+    </div>
+
+    <!-- Checkout btn -->
+    <button class="btn btn-cyan w-full btn-lg" (click)="checkout()" [disabled]="checkingOut()">
+      <span *ngIf="!checkingOut()">💳 Finalizar Compra</span>
+      <span *ngIf="checkingOut()" class="loader-dots">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+
+    <button class="btn btn-ghost w-full btn-sm mt-8" (click)="cartService.clearCart()">
+      🗑 Vaciar Carrito
+    </button>
+
+    <!-- Cupones hint -->
+    <p class="coupon-hint">Cupones: NEON10 · GAMER20 · VIP30</p>
+  </div>
+</aside>
