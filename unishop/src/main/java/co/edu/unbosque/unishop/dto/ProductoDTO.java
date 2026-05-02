@@ -1,28 +1,20 @@
-package co.edu.unbosque.unishop.entity;
+package co.edu.unbosque.unishop.dto;
 
 import java.math.BigDecimal;
-import java.util.Objects;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 
-@Entity
-@Table(name = "producto")
-public class Producto {
+public class ProductoDTO {
 
-	private @Id @GeneratedValue(strategy = GenerationType.IDENTITY) Long id;
+	private Long id;
 	private String nombreProducto;
 	private String descripcionProducto;
 	private BigDecimal precioProducto;
 	private String tienda;
 
-	public Producto() {
+	public ProductoDTO() {
 
 	}
 
-	public Producto(String nombreProducto, String descripcionProducto, BigDecimal precioProducto, String tienda) {
+	public ProductoDTO(String nombreProducto, String descripcionProducto, BigDecimal precioProducto, String tienda) {
 		super();
 		this.nombreProducto = nombreProducto;
 		this.descripcionProducto = descripcionProducto;
@@ -31,25 +23,8 @@ public class Producto {
 	}
 
 	@Override
-	public int hashCode() {
-		return Objects.hash(id);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Producto other = (Producto) obj;
-		return Objects.equals(id, other.id);
-	}
-
-	@Override
 	public String toString() {
-		return "Producto [id=" + id + ", nombreProducto=" + nombreProducto + ", descripcionProducto="
+		return "ProductoDTO [id=" + id + ", nombreProducto=" + nombreProducto + ", descripcionProducto="
 				+ descripcionProducto + ", precioProducto=" + precioProducto + ", tienda=" + tienda + "]";
 	}
 
