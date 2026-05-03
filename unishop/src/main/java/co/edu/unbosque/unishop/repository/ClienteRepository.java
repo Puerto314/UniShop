@@ -6,5 +6,5 @@ import co.edu.unbosque.unishop.entity.Cliente;
 
 public interface ClienteRepository extends CrudRepository<Cliente, Long> {
 
-	Optional<Cliente> findByUsuario(String usuario);
+	Optional<Cliente> findById(Long id);
 }
