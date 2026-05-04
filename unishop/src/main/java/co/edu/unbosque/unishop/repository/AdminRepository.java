@@ -6,5 +6,5 @@ import co.edu.unbosque.unishop.entity.Admin;
 
 public interface AdminRepository extends CrudRepository<Admin, Long> {
 
-	Optional<Admin> findByUsuario(String usuario);
+	Optional<Admin> findById(Long id);
 }

@@ -6,5 +6,5 @@ import co.edu.unbosque.unishop.entity.Producto;
 
 public interface ProductoRepository extends CrudRepository<Producto, Long> {
 
-	Optional<Producto> findByUsuario(String usuario);
+	Optional<Producto> findById(Long id);
 }
