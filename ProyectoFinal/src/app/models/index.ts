@@ -46,3 +46,35 @@ export interface ToastMessage {
   type: 'success' | 'error' | 'info' | 'warning';
   message: string;
 }
+
+// ── Modelos para comparador externo ──────────────────────────────────────────
+
+export interface ExternalProduct {
+  nombreProducto: string;
+  descripcionProducto: string;
+  precioProducto: number;
+  tienda: 'Amazon' | 'MercadoLibre';
+  thumbnail?: string;
+  permalink?: string;
+}
+
+export interface BuscarResponse {
+  mercadoLibre: ExternalProduct[];
+  mercadoLibreUrl: string;
+  amazon: ExternalProduct[];
+}
+
+export interface MercadoLibreRawItem {
+  id: string;
+  title: string;
+  price: number;
+  permalink: string;
+  thumbnail: string;
+  currency_id: string;
+  condition: string;
+  available_quantity: number;
+}
+
+export interface MercadoLibreSearchResponse {
+  results: MercadoLibreRawItem[];
+}

@@ -1,0 +1,172 @@
+<div class="compare-page">
+
+  <!-- HEADER -->
+  <div class="compare-header">
+    <div class="compare-header-inner">
+      <h1 class="compare-title">
+        <span class="neon-cyan">🔍</span> COMPARADOR DE PRECIOS
+      </h1>
+      <p class="compare-subtitle">Busca cualquier producto y compara entre MercadoLibre y Amazon Colombia en tiempo real</p>
+
+      <!-- BUSCADOR -->
+      <div class="search-bar">
+        <span class="sb-icon">🛍️</span>
+        <input
+          class="sb-input"
+          type="text"
+          placeholder="Ej: celular samsung, audífonos sony, teclado mecánico..."
+          [(ngModel)]="searchQuery"
+          (keyup)="onKey($event)"
+        />
+        <button class="sb-btn" (click)="search()" [disabled]="svc.loading()">
+          <span *ngIf="!svc.loading()">BUSCAR</span>
+          <span *ngIf="svc.loading()">⏳</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ERROR -->
+  <div class="compare-error" *ngIf="svc.error()">
+    <span>⚠️ {{ svc.error() }}</span>
+  </div>
+
+  <!-- LOADING -->
+  <div class="compare-loading" *ngIf="svc.loading()">
+    <div class="spinner"></div>
+    <p>Buscando en MercadoLibre y Amazon...</p>
+  </div>
+
+  <!-- RESUMEN DE MEJORES PRECIOS -->
+  <div class="summary-bar" *ngIf="!svc.loading() && svc.searched() && (svc.mlItems().length || svc.amItems().length)">
+    <div class="summary-inner">
+      <div class="summary-item" *ngIf="cheapestML">
+        <span class="summary-store ml-color">🟡 Mejor en ML</span>
+        <span class="summary-name">{{ cheapestML.nombreProducto | slice:0:40 }}{{ cheapestML.nombreProducto.length > 40 ? '...' : '' }}</span>
+        <span class="summary-price neon-yellow">{{ svc.formatPrice(cheapestML.precioProducto) }}</span>
+      </div>
+      <div class="summary-divider" *ngIf="cheapestML && cheapestAM">VS</div>
+      <div class="summary-item" *ngIf="cheapestAM">
+        <span class="summary-store am-color">🟠 Mejor en Amazon</span>
+        <span class="summary-name">{{ cheapestAM.nombreProducto | slice:0:40 }}{{ cheapestAM.nombreProducto.length > 40 ? '...' : '' }}</span>
+        <span class="summary-price neon-cyan">{{ svc.formatPrice(cheapestAM.precioProducto) }}</span>
+      </div>
+      <div class="summary-winner" *ngIf="overallCheapest">
+        🏆 <strong>Mejor precio global:</strong>
+        <span [class.neon-yellow]="overallCheapest.tienda === 'MercadoLibre'"
+              [class.neon-cyan]="overallCheapest.tienda === 'Amazon'">
+          {{ overallCheapest.tienda }}
+        </span>
+        — {{ svc.formatPrice(overallCheapest.precioProducto) }}
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTADOS -->
+  <div class="results-container" *ngIf="!svc.loading() && svc.searched()">
+
+    <!-- COLUMNA MERCADO LIBRE -->
+    <div class="results-column">
+      <div class="col-header ml-header">
+        <span class="col-logo">🟡</span>
+        <h2>MercadoLibre</h2>
+        <span class="col-count">{{ svc.mlItems().length }} resultados</span>
+      </div>
+
+      <div class="empty-col" *ngIf="!svc.mlItems().length">
+        <span class="empty-icon">😕</span>
+        <p>Sin resultados en MercadoLibre</p>
+      </div>
+
+      <div class="product-list">
+        <div
+          class="product-card"
+          [class.cheapest-card]="isCheapest(p)"
+          *ngFor="let p of svc.mlItems()"
+          (click)="openLink(p)"
+        >
+          <div class="cheapest-badge" *ngIf="isCheapest(p)">🏆 MEJOR PRECIO</div>
+          <div class="card-top">
+            <img
+              *ngIf="p.thumbnail"
+              [src]="p.thumbnail"
+              [alt]="p.nombreProducto"
+              class="card-img"
+              (error)="$any($event.target).style.display='none'"
+            />
+            <div class="card-no-img" *ngIf="!p.thumbnail">🛒</div>
+          </div>
+          <div class="card-body">
+            <span class="card-store ml-badge">MercadoLibre</span>
+            <h3 class="card-name">{{ p.nombreProducto }}</h3>
+            <div class="card-price">
+              <span class="price-amount" [class.neon-yellow]="isCheapest(p)">
+                {{ svc.formatPrice(p.precioProducto) }}
+              </span>
+              <span class="price-currency">COP</span>
+            </div>
+            <button class="card-link ml-btn">Ver en MercadoLibre →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DIVISOR -->
+    <div class="col-divider">
+      <span>VS</span>
+    </div>
+
+    <!-- COLUMNA AMAZON -->
+    <div class="results-column">
+      <div class="col-header am-header">
+        <span class="col-logo">🟠</span>
+        <h2>Amazon Colombia</h2>
+        <span class="col-count">{{ svc.amItems().length }} resultados</span>
+      </div>
+
+      <div class="empty-col" *ngIf="!svc.amItems().length">
+        <span class="empty-icon">😕</span>
+        <p>Sin resultados en Amazon</p>
+      </div>
+
+      <div class="product-list">
+        <div
+          class="product-card"
+          [class.cheapest-card]="isCheapest(p)"
+          *ngFor="let p of svc.amItems()"
+          (click)="openLink(p)"
+        >
+          <div class="cheapest-badge" *ngIf="isCheapest(p)">🏆 MEJOR PRECIO</div>
+          <div class="card-top card-top-am">
+            <div class="card-no-img">📦</div>
+          </div>
+          <div class="card-body">
+            <span class="card-store am-badge">Amazon</span>
+            <h3 class="card-name">{{ p.nombreProducto }}</h3>
+            <div class="card-price">
+              <span class="price-amount" [class.neon-cyan]="isCheapest(p)">
+                {{ p.precioProducto > 0 ? svc.formatPrice(p.precioProducto) : 'Ver precio' }}
+              </span>
+              <span class="price-currency" *ngIf="p.precioProducto > 0">COP</span>
+            </div>
+            <button class="card-link am-btn">Ver en Amazon →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EMPTY STATE inicial -->
+  <div class="compare-empty" *ngIf="!svc.loading() && !svc.searched()">
+    <div class="empty-icon-lg">🛍️</div>
+    <h2>¿Qué producto quieres comparar?</h2>
+    <p>Escribe el nombre de cualquier producto en el buscador de arriba para ver los precios en MercadoLibre y Amazon Colombia al mismo tiempo.</p>
+    <div class="example-chips">
+      <button class="chip" (click)="searchQuery='celular samsung'; search()">📱 Celular Samsung</button>
+      <button class="chip" (click)="searchQuery='audífonos sony'; search()">🎧 Audífonos Sony</button>
+      <button class="chip" (click)="searchQuery='teclado mecánico'; search()">⌨️ Teclado Mecánico</button>
+      <button class="chip" (click)="searchQuery='silla gamer'; search()">🪑 Silla Gamer</button>
+    </div>
+  </div>
+
+</div>
