@@ -21,7 +21,11 @@ public class LanzadorException {
 		}
 	}
 
-	public static void verificarContraseñaValida(String entrada) throws ContraseniaUsuarioException {
+	public static void verificarContrasenaValida(String entrada) throws ContraseniaUsuarioException {
+		// CORREGIDO: validación de null antes de operar sobre la cadena
+		if (entrada == null || entrada.isEmpty()) {
+			throw new ContraseniaUsuarioException();
+		}
 
 		if (entrada.length() < 8) {
 			throw new ContraseniaUsuarioException();
@@ -44,10 +48,14 @@ public class LanzadorException {
 		if (!(tieneMayuscula && tieneMinuscula && tieneNumero)) {
 			throw new ContraseniaUsuarioException();
 		}
-
 	}
 
 	public static void verificarNombreUsuario(String entrada) throws NombreUsuarioException {
+		// CORREGIDO: validación de null antes de operar sobre la cadena
+		if (entrada == null || entrada.trim().isEmpty()) {
+			throw new NombreUsuarioException();
+		}
+
 		if (entrada.length() < 4 || entrada.length() > 14) {
 			throw new NombreUsuarioException();
 		}
@@ -63,7 +71,6 @@ public class LanzadorException {
 		if (!tieneLetra) {
 			throw new NombreUsuarioException();
 		}
-
 	}
 
 }

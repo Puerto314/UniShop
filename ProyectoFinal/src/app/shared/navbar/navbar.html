@@ -1,4 +1,3 @@
-<!-- NAVBAR -->
 <header class="navbar" [class.scrolled]="scrolled()">
   <div class="nb-inner">
 
@@ -25,7 +24,7 @@
     <!-- Right actions -->
     <nav class="nb-actions" *ngIf="auth.isLoggedIn()">
 
-      <!-- Categories -->
+      <!-- Categories dropdown -->
       <div class="nb-dropdown">
         <button class="nb-link">Categorías ▾</button>
         <div class="nb-dropdown-menu">
@@ -37,7 +36,8 @@
         </div>
       </div>
 
-      <a routerLink="/home" class="nb-link">Tienda</a>
+      <a routerLink="/home"    class="nb-link">Tienda</a>
+      <a routerLink="/compare" class="nb-link neon-cyan">🔍 Comparar</a>
       <a routerLink="/history" class="nb-link">Mis Pedidos</a>
       <a *ngIf="auth.isAdmin()" routerLink="/admin" class="nb-link neon-magenta">Admin</a>
 
@@ -50,11 +50,8 @@
       <!-- User menu -->
       <div class="nb-dropdown">
         <button class="nb-user-btn">
-          <!-- <span class="user-avatar">{{ auth.user()?.name?.charAt(0) }}</span>   -->
-          <!--  <span class="user-name">{{ auth.user()?.name?.split(' ')[0] }}</span>   -->
           <span class="user-avatar">{{ userInitial }}</span>
           <span class="user-name">{{ userFirstName }}</span>
-
         </button>
         <div class="nb-dropdown-menu align-right">
           <div class="dd-header">
@@ -65,7 +62,7 @@
           </div>
           <div class="dd-divider"></div>
           <a routerLink="/history" class="dd-item">📦 Mis Pedidos</a>
-          <a routerLink="/history" class="dd-item">❤️ Favoritos</a>
+          <a routerLink="/compare" class="dd-item">🔍 Comparar Precios</a>
           <a *ngIf="auth.isAdmin()" routerLink="/admin" class="dd-item">⚙️ Panel Admin</a>
           <div class="dd-divider"></div>
           <button class="dd-item dd-logout" (click)="logout()">🚪 Cerrar Sesión</button>
@@ -83,7 +80,8 @@
 
   <!-- Mobile menu -->
   <div class="nb-mobile" *ngIf="mobileOpen() && auth.isLoggedIn()">
-    <a routerLink="/home" class="mob-link" (click)="mobileOpen.set(false)">Tienda</a>
+    <a routerLink="/home"    class="mob-link" (click)="mobileOpen.set(false)">Tienda</a>
+    <a routerLink="/compare" class="mob-link" (click)="mobileOpen.set(false)">🔍 Comparar</a>
     <a routerLink="/history" class="mob-link" (click)="mobileOpen.set(false)">Mis Pedidos</a>
     <a *ngIf="auth.isAdmin()" routerLink="/admin" class="mob-link" (click)="mobileOpen.set(false)">Admin</a>
     <button class="mob-link mob-logout" (click)="logout(); mobileOpen.set(false)">Cerrar Sesión</button>

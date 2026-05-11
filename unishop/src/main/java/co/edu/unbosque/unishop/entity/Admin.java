@@ -10,13 +10,11 @@ public class Admin extends Usuario {
 	private String codigoAdmin;
 
 	public Admin() {
-
 	}
 
-	public Admin(String codigoAdmin) {
-		super();
-		this.codigoAdmin = codigoAdmin;
-	}
+	// CORREGIDO: eliminado constructor ambiguo Admin(String codigoAdmin) que
+	// confundía codigoAdmin con nombreUsuario al llamar super() sin argumentos.
+	// Se mantienen solo los constructores con parámetros claros.
 
 	public Admin(String nombreUsuario, String contraseniaUsuario) {
 		super(nombreUsuario, contraseniaUsuario);
@@ -37,7 +35,7 @@ public class Admin extends Usuario {
 
 	@Override
 	public String toString() {
-		return super.toString() + "Admin [codigoAdmin=" + codigoAdmin + "]";
+		return super.toString() + " Admin [codigoAdmin=" + codigoAdmin + "]";
 	}
 
 }

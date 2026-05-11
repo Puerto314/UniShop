@@ -1,10 +1,12 @@
 package co.edu.unbosque.unishop.service;
 
+import java.util.List;
+
 public interface CRUDOPERATION<T> {
 
 	public int create(T data);
 
-	public String getAll();
+	public List<T> getAll();
 
 	public int deleteById(Long id);
 
