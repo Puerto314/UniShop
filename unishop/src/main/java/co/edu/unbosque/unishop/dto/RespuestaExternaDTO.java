@@ -2,30 +2,20 @@ package co.edu.unbosque.unishop.dto;
 
 import java.util.List;
 
+/**
+ * Respuesta del endpoint /producto/buscar.
+ * Solo Amazon — MercadoLibre eliminado.
+ */
 public class RespuestaExternaDTO {
 
-    private List<ProductoDTO> mercadoLibre;
-    private List<ProductoDTO> amazon;
-
-    /**
-     * URL lista para que el FRONTEND llame directamente a MercadoLibre.
-     * Los servidores cloud/ngrok están bloqueados por ML; el browser NO.
-     */
-    private String mercadoLibreUrl;
+    private List<AmazonItemDTO> amazon;
 
     public RespuestaExternaDTO() {}
 
-    public RespuestaExternaDTO(List<ProductoDTO> mercadoLibre, List<ProductoDTO> amazon) {
-        this.mercadoLibre = mercadoLibre;
+    public RespuestaExternaDTO(List<AmazonItemDTO> amazon) {
         this.amazon = amazon;
     }
 
-    public List<ProductoDTO> getMercadoLibre() { return mercadoLibre; }
-    public void setMercadoLibre(List<ProductoDTO> ml) { this.mercadoLibre = ml; }
-
-    public List<ProductoDTO> getAmazon() { return amazon; }
-    public void setAmazon(List<ProductoDTO> amazon) { this.amazon = amazon; }
-
-    public String getMercadoLibreUrl() { return mercadoLibreUrl; }
-    public void setMercadoLibreUrl(String url) { this.mercadoLibreUrl = url; }
+    public List<AmazonItemDTO> getAmazon()              { return amazon; }
+    public void                setAmazon(List<AmazonItemDTO> v) { this.amazon = v; }
 }

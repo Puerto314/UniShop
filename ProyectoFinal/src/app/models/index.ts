@@ -47,34 +47,30 @@ export interface ToastMessage {
   message: string;
 }
 
-// ── Modelos para comparador externo ──────────────────────────────────────────
+// ── Modelos Amazon ────────────────────────────────────────────────────────────
 
-export interface ExternalProduct {
-  nombreProducto: string;
-  descripcionProducto: string;
-  precioProducto: number;
-  tienda: 'Amazon' | 'MercadoLibre';
-  thumbnail?: string;
-  permalink?: string;
-}
-
-export interface BuscarResponse {
-  mercadoLibre: ExternalProduct[];
-  mercadoLibreUrl: string;
-  amazon: ExternalProduct[];
-}
-
-export interface MercadoLibreRawItem {
-  id: string;
+/** Un producto devuelto por el backend desde Amazon.com (precio en USD). */
+export interface AmazonProduct {
+  asin: string;
   title: string;
+  /** Precio en USD (ej: 12.99). 0 = no disponible. */
   price: number;
-  permalink: string;
-  thumbnail: string;
-  currency_id: string;
-  condition: string;
-  available_quantity: number;
+  url: string;
+  imageUrl?: string;
+  rating?: number;
+  reviewCount?: number;
 }
 
-export interface MercadoLibreSearchResponse {
-  results: MercadoLibreRawItem[];
+/** Respuesta del endpoint GET /producto/buscar?nombre=... */
+export interface BuscarResponse {
+  amazon: AmazonProduct[];
+}
+
+/** Una reseña devuelta por GET /producto/resenas?asin=... */
+export interface AmazonReview {
+  author: string;
+  title?: string;
+  body?: string;
+  rating?: number;
+  date?: string;
 }
