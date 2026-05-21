@@ -4,17 +4,19 @@
   <div class="compare-header">
     <div class="compare-header-inner">
       <h1 class="compare-title">
-        <span class="neon-cyan">🔍</span> COMPARADOR DE PRECIOS
+        <span class="neon-cyan">🛒</span> BUSCAR EN AMAZON
       </h1>
-      <p class="compare-subtitle">Busca cualquier producto y compara entre MercadoLibre y Amazon Colombia en tiempo real</p>
+      <p class="compare-subtitle">
+        Busca cualquier producto y compara resultados con precios en pesos colombianos
+      </p>
 
       <!-- BUSCADOR -->
       <div class="search-bar">
-        <span class="sb-icon">🛍️</span>
+        <span class="sb-icon">🔍</span>
         <input
           class="sb-input"
           type="text"
-          placeholder="Ej: celular samsung, audífonos sony, teclado mecánico..."
+          placeholder="Ej: iphone 15, samsung galaxy, teclado mecánico..."
           [(ngModel)]="searchQuery"
           (keyup)="onKey($event)"
         />
@@ -22,6 +24,15 @@
           <span *ngIf="!svc.loading()">BUSCAR</span>
           <span *ngIf="svc.loading()">⏳</span>
         </button>
+      </div>
+
+      <!-- Chips de ejemplo -->
+      <div class="example-chips" *ngIf="!svc.searched()">
+        <button class="chip" (click)="searchQuery='iphone 15'; search()">📱 iPhone 15</button>
+        <button class="chip" (click)="searchQuery='samsung galaxy s24'; search()">📱 Galaxy S24</button>
+        <button class="chip" (click)="searchQuery='mechanical keyboard'; search()">⌨️ Teclado Mecánico</button>
+        <button class="chip" (click)="searchQuery='gaming headset'; search()">🎧 Audífonos Gamer</button>
+        <button class="chip" (click)="searchQuery='monitor 4k'; search()">🖥️ Monitor 4K</button>
       </div>
     </div>
   </div>
@@ -34,139 +45,216 @@
   <!-- LOADING -->
   <div class="compare-loading" *ngIf="svc.loading()">
     <div class="spinner"></div>
-    <p>Buscando en MercadoLibre y Amazon...</p>
+    <p>Buscando en Amazon...</p>
   </div>
 
-  <!-- RESUMEN DE MEJORES PRECIOS -->
-  <div class="summary-bar" *ngIf="!svc.loading() && svc.searched() && (svc.mlItems().length || svc.amItems().length)">
-    <div class="summary-inner">
-      <div class="summary-item" *ngIf="cheapestML">
-        <span class="summary-store ml-color">🟡 Mejor en ML</span>
-        <span class="summary-name">{{ cheapestML.nombreProducto | slice:0:40 }}{{ cheapestML.nombreProducto.length > 40 ? '...' : '' }}</span>
-        <span class="summary-price neon-yellow">{{ svc.formatPrice(cheapestML.precioProducto) }}</span>
-      </div>
-      <div class="summary-divider" *ngIf="cheapestML && cheapestAM">VS</div>
-      <div class="summary-item" *ngIf="cheapestAM">
-        <span class="summary-store am-color">🟠 Mejor en Amazon</span>
-        <span class="summary-name">{{ cheapestAM.nombreProducto | slice:0:40 }}{{ cheapestAM.nombreProducto.length > 40 ? '...' : '' }}</span>
-        <span class="summary-price neon-cyan">{{ svc.formatPrice(cheapestAM.precioProducto) }}</span>
-      </div>
-      <div class="summary-winner" *ngIf="overallCheapest">
-        🏆 <strong>Mejor precio global:</strong>
-        <span [class.neon-yellow]="overallCheapest.tienda === 'MercadoLibre'"
-              [class.neon-cyan]="overallCheapest.tienda === 'Amazon'">
-          {{ overallCheapest.tienda }}
-        </span>
-        — {{ svc.formatPrice(overallCheapest.precioProducto) }}
-      </div>
+  <!-- MEJOR PRECIO -->
+  <div class="best-price-bar" *ngIf="!svc.loading() && svc.amItems().length && svc.cheapest">
+    <div class="best-price-inner">
+      <span class="bp-label">🏆 Mejor precio encontrado:</span>
+      <span class="bp-title">
+        {{ svc.cheapest!.title | slice:0:50 }}
+        {{ (svc.cheapest!.title?.length ?? 0) > 50 ? '...' : '' }}
+      </span>
+
+      <span class="bp-price neon-cyan">
+        {{ svc.cheapest!.price | currency:'COP':'symbol':'1.0-0' }}
+      </span>
     </div>
   </div>
 
   <!-- RESULTADOS -->
-  <div class="results-container" *ngIf="!svc.loading() && svc.searched()">
+  <div class="results-wrapper" *ngIf="!svc.loading() && svc.searched()">
 
-    <!-- COLUMNA MERCADO LIBRE -->
-    <div class="results-column">
-      <div class="col-header ml-header">
-        <span class="col-logo">🟡</span>
-        <h2>MercadoLibre</h2>
-        <span class="col-count">{{ svc.mlItems().length }} resultados</span>
-      </div>
+    <!-- Encabezado columna -->
+    <div class="col-header am-header">
+      <span class="col-logo">📦</span>
+      <h2>Amazon.com</h2>
+      <span class="col-count">
+        {{ svc.amItems().length }} resultado{{ svc.amItems().length !== 1 ? 's' : '' }}
+      </span>
+    </div>
 
-      <div class="empty-col" *ngIf="!svc.mlItems().length">
-        <span class="empty-icon">😕</span>
-        <p>Sin resultados en MercadoLibre</p>
-      </div>
+    <!-- Sin resultados -->
+    <div class="empty-col" *ngIf="!svc.amItems().length">
+      <span class="empty-icon">😕</span>
+      <p>Sin resultados. Intenta con otro término de búsqueda.</p>
+    </div>
 
-      <div class="product-list">
-        <div
-          class="product-card"
-          [class.cheapest-card]="isCheapest(p)"
-          *ngFor="let p of svc.mlItems()"
-          (click)="openLink(p)"
-        >
-          <div class="cheapest-badge" *ngIf="isCheapest(p)">🏆 MEJOR PRECIO</div>
-          <div class="card-top">
-            <img
-              *ngIf="p.thumbnail"
-              [src]="p.thumbnail"
-              [alt]="p.nombreProducto"
-              class="card-img"
-              (error)="$any($event.target).style.display='none'"
-            />
-            <div class="card-no-img" *ngIf="!p.thumbnail">🛒</div>
+    <!-- Grid de productos -->
+    <div class="product-grid">
+      <div
+        class="product-card"
+        [class.cheapest-card]="svc.isCheapest(p)"
+        *ngFor="let p of svc.amItems()"
+      >
+
+        <!-- Badge mejor precio -->
+        <div class="cheapest-badge" *ngIf="svc.isCheapest(p)">
+          🏆 MEJOR PRECIO
+        </div>
+
+        <!-- Imagen -->
+        <div class="card-img-wrap" (click)="openProduct(p)">
+          <img
+            *ngIf="p.imageUrl"
+            [src]="p.imageUrl"
+            [alt]="p.title"
+            class="card-img"
+            (error)="$any($event.target).style.display='none'"
+          />
+
+          <div class="card-no-img" *ngIf="!p.imageUrl">
+            📦
           </div>
-          <div class="card-body">
-            <span class="card-store ml-badge">MercadoLibre</span>
-            <h3 class="card-name">{{ p.nombreProducto }}</h3>
-            <div class="card-price">
-              <span class="price-amount" [class.neon-yellow]="isCheapest(p)">
-                {{ svc.formatPrice(p.precioProducto) }}
-              </span>
-              <span class="price-currency">COP</span>
-            </div>
-            <button class="card-link ml-btn">Ver en MercadoLibre →</button>
+        </div>
+
+        <div class="card-body">
+
+          <!-- Store badge -->
+          <span class="card-store am-badge">Amazon</span>
+
+          <!-- Título -->
+          <h3
+            class="card-name"
+            (click)="openProduct(p)"
+            title="{{ p.title }}"
+          >
+            {{ p.title }}
+          </h3>
+
+          <!-- Rating -->
+          <div class="card-rating" *ngIf="p.rating">
+            <span class="stars">{{ svc.stars(p.rating) }}</span>
+
+            <span class="rating-val">
+              {{ p.rating | number:'1.1-1' }}
+            </span>
+
+            <span class="review-count" *ngIf="p.reviewCount">
+              ({{ p.reviewCount | number }})
+            </span>
+          </div>
+
+          <!-- Precio en COP -->
+          <div class="card-price">
+            <span
+              class="price-amount"
+              [class.neon-cyan]="svc.isCheapest(p)"
+            >
+              {{
+                p.price > 0
+                  ? (p.price | currency:'COP':'symbol':'1.0-0')
+                  : '—'
+              }}
+            </span>
+          </div>
+
+          <!-- Acciones -->
+          <div class="card-actions">
+
+            <button
+              class="btn-ver am-btn"
+              (click)="openProduct(p)"
+            >
+              Ver en Amazon →
+            </button>
+
+            <button
+              class="btn-resenas"
+              [class.active]="svc.reviewsFor()?.asin === p.asin"
+              (click)="verResenas(p)"
+            >
+              {{
+                svc.reviewsFor()?.asin === p.asin
+                  ? '✕ Cerrar reseñas'
+                  : '💬 Ver reseñas'
+              }}
+            </button>
+
           </div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- DIVISOR -->
-    <div class="col-divider">
-      <span>VS</span>
+  <!-- PANEL DE RESEÑAS -->
+  <div class="reviews-panel" *ngIf="svc.reviewsFor()">
+
+    <div class="reviews-panel-header">
+      <h3>
+        💬 Reseñas de:
+        <span class="neon-cyan">
+          {{ svc.reviewsFor()!.title | slice:0:60 }}
+          {{ (svc.reviewsFor()!.title?.length ?? 0) > 60 ? '...' : '' }}
+        </span>
+      </h3>
+
+      <button class="reviews-close" (click)="cerrarResenas()">
+        ✕ Cerrar
+      </button>
     </div>
 
-    <!-- COLUMNA AMAZON -->
-    <div class="results-column">
-      <div class="col-header am-header">
-        <span class="col-logo">🟠</span>
-        <h2>Amazon Colombia</h2>
-        <span class="col-count">{{ svc.amItems().length }} resultados</span>
-      </div>
+    <!-- Loading reseñas -->
+    <div class="compare-loading" *ngIf="svc.loadingReviews()">
+      <div class="spinner"></div>
+      <p>Cargando reseñas...</p>
+    </div>
 
-      <div class="empty-col" *ngIf="!svc.amItems().length">
-        <span class="empty-icon">😕</span>
-        <p>Sin resultados en Amazon</p>
-      </div>
+    <!-- Error reseñas -->
+    <div class="compare-error" *ngIf="svc.errorReviews()">
+      ⚠️ {{ svc.errorReviews() }}
+    </div>
 
-      <div class="product-list">
-        <div
-          class="product-card"
-          [class.cheapest-card]="isCheapest(p)"
-          *ngFor="let p of svc.amItems()"
-          (click)="openLink(p)"
-        >
-          <div class="cheapest-badge" *ngIf="isCheapest(p)">🏆 MEJOR PRECIO</div>
-          <div class="card-top card-top-am">
-            <div class="card-no-img">📦</div>
-          </div>
-          <div class="card-body">
-            <span class="card-store am-badge">Amazon</span>
-            <h3 class="card-name">{{ p.nombreProducto }}</h3>
-            <div class="card-price">
-              <span class="price-amount" [class.neon-cyan]="isCheapest(p)">
-                {{ p.precioProducto > 0 ? svc.formatPrice(p.precioProducto) : 'Ver precio' }}
-              </span>
-              <span class="price-currency" *ngIf="p.precioProducto > 0">COP</span>
-            </div>
-            <button class="card-link am-btn">Ver en Amazon →</button>
-          </div>
+    <!-- Lista de reseñas -->
+    <div class="reviews-list" *ngIf="!svc.loadingReviews()">
+
+      <div class="review-card" *ngFor="let r of svc.reviews()">
+
+        <div class="review-top">
+          <span class="review-author">{{ r.author }}</span>
+
+          <span class="review-stars" *ngIf="r.rating">
+            {{ svc.stars(r.rating) }}
+          </span>
+
+          <span class="review-date" *ngIf="r.date">
+            {{ r.date }}
+          </span>
         </div>
+
+        <div class="review-title" *ngIf="r.title">
+          {{ r.title }}
+        </div>
+
+        <div class="review-body" *ngIf="r.body">
+          {{ r.body }}
+        </div>
+
       </div>
+
+      <!-- Sin reseñas -->
+      <div
+        class="empty-col"
+        *ngIf="!svc.reviews().length && !svc.loadingReviews() && !svc.errorReviews()"
+      >
+        <span class="empty-icon">💬</span>
+        <p>No se encontraron reseñas para este producto.</p>
+      </div>
+
     </div>
   </div>
 
   <!-- EMPTY STATE inicial -->
   <div class="compare-empty" *ngIf="!svc.loading() && !svc.searched()">
-    <div class="empty-icon-lg">🛍️</div>
-    <h2>¿Qué producto quieres comparar?</h2>
-    <p>Escribe el nombre de cualquier producto en el buscador de arriba para ver los precios en MercadoLibre y Amazon Colombia al mismo tiempo.</p>
-    <div class="example-chips">
-      <button class="chip" (click)="searchQuery='celular samsung'; search()">📱 Celular Samsung</button>
-      <button class="chip" (click)="searchQuery='audífonos sony'; search()">🎧 Audífonos Sony</button>
-      <button class="chip" (click)="searchQuery='teclado mecánico'; search()">⌨️ Teclado Mecánico</button>
-      <button class="chip" (click)="searchQuery='silla gamer'; search()">🪑 Silla Gamer</button>
-    </div>
+    <div class="empty-icon-lg">🛒</div>
+
+    <h2>¿Qué producto quieres buscar?</h2>
+
+    <p>
+      Escribe el nombre de cualquier producto para ver los resultados de
+      Amazon en tiempo real con precios en pesos colombianos.
+    </p>
   </div>
 
 </div>
