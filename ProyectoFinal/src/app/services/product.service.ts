@@ -3,36 +3,106 @@ import { ProductItem } from '../models';
 
 @Injectable({ providedIn: 'root' })
 export class ProductService {
-  private _search  = signal('');
+  private _search   = signal('');
   private _category = signal('all');
 
-  readonly searchTerm = this._search.asReadonly();
+  readonly searchTerm     = this._search.asReadonly();
   readonly activeCategory = this._category.asReadonly();
 
+  /** Productos reales con links a Amazon */
   readonly PRODUCTS: ProductItem[] = [
-    { id:1,  name:'Teclado Mecánico RGB K95',   price:189000, originalPrice:229000, image:'https://placehold.co/400x300/111/00f5ff?text=TECLADO', category:'gaming',     rating:4.9, reviews:312, stock:12, tags:['RGB','Cherry MX'], isHot:true },
-    { id:2,  name:'Mouse Inalámbrico Pro X',     price:129000, originalPrice:159000, image:'https://placehold.co/400x300/111/ff006e?text=MOUSE',   category:'gaming',     rating:4.7, reviews:198, stock:25, tags:['25600 DPI'], isNew:true },
-    { id:3,  name:'Audífonos Gamer 7.1 Surround',price:249000, originalPrice:299000, image:'https://placehold.co/400x300/111/ffbe00?text=HEADSET', category:'audio',      rating:4.8, reviews:445, stock:8,  tags:['7.1','Noise Cancel'], isHot:true },
-    { id:4,  name:'Monitor 27" 165Hz IPS',       price:890000, originalPrice:1050000,image:'https://placehold.co/400x300/111/00ff88?text=MONITOR', category:'monitores',  rating:4.9, reviews:267, stock:5,  tags:['165Hz','1ms','IPS'] },
-    { id:5,  name:'SSD NVMe 1TB Gen4',            price:219000, originalPrice:269000, image:'https://placehold.co/400x300/111/ff2d55?text=SSD',     category:'almacenamiento',rating:4.8,reviews:523,stock:30,tags:['7000MB/s','PCIe 4.0'] },
-    { id:6,  name:'RAM DDR5 32GB 6000MHz',        price:349000, originalPrice:399000, image:'https://placehold.co/400x300/111/00f5ff?text=RAM',     category:'componentes',rating:4.7, reviews:189, stock:18, tags:['DDR5','XMP 3.0'], isNew:true },
-    { id:7,  name:'GPU RTX 5070 Ti 12GB',         price:2890000,originalPrice:3200000,image:'https://placehold.co/400x300/111/ff006e?text=GPU',     category:'componentes',rating:4.9, reviews:87,  stock:3,  tags:['DLSS 4','RT'], isHot:true },
-    { id:8,  name:'Silla Gamer Pro Lumbar',       price:689000, originalPrice:799000, image:'https://placehold.co/400x300/111/ffbe00?text=SILLA',   category:'muebles',    rating:4.6, reviews:342, stock:15, tags:['Ergonómica','4D'] },
-    { id:9,  name:'Webcam 4K 60fps AF',           price:289000, originalPrice:349000, image:'https://placehold.co/400x300/111/00ff88?text=WEBCAM',  category:'streaming',  rating:4.7, reviews:156, stock:22, tags:['4K','Autofocus'] },
-    { id:10, name:'Micrófono USB Condensador',    price:189000, originalPrice:219000, image:'https://placehold.co/400x300/111/ff2d55?text=MIC',     category:'streaming',  rating:4.8, reviews:298, stock:14, isNew:true, tags:['Cardioide','RGB'] },
-    { id:11, name:'Pad XL RGB 90x40cm',           price:79000,  originalPrice:99000,  image:'https://placehold.co/400x300/111/00f5ff?text=PAD',     category:'gaming',     rating:4.5, reviews:421, stock:50, tags:['XXL','RGB Border'] },
-    { id:12, name:'Capturadora 4K HDMI',          price:319000, originalPrice:389000, image:'https://placehold.co/400x300/111/ff006e?text=CAPTURE', category:'streaming',  rating:4.6, reviews:134, stock:9,  tags:['4K30fps','USB-C'] },
-    { id:13, name:'Hub USB-C 12 en 1',            price:139000, originalPrice:169000, image:'https://placehold.co/400x300/111/ffbe00?text=HUB',     category:'accesorios', rating:4.7, reviews:267, stock:35, tags:['HDMI 4K','100W PD'] },
-    { id:14, name:'Controlador Xbox Elite S3',    price:549000, originalPrice:599000, image:'https://placehold.co/400x300/111/00ff88?text=CONTROL', category:'gaming',     rating:4.8, reviews:189, stock:7,  isHot:true, tags:['Hall Effect','BT 5.2'] },
-    { id:15, name:'Fuente 850W 80+ Gold',         price:389000, originalPrice:449000, image:'https://placehold.co/400x300/111/ff2d55?text=PSU',     category:'componentes',rating:4.9, reviews:312, stock:20, tags:['Modular','80+Gold'] },
-    { id:16, name:'Case ATX Mid Tower Mesh',      price:289000, originalPrice:329000, image:'https://placehold.co/400x300/111/00f5ff?text=CASE',    category:'componentes',rating:4.7, reviews:245, stock:11, tags:['Tempered Glass','Airflow'] },
+    {
+      id: 1, name: 'Apple iPhone 15 128GB', price: 3490000, originalPrice: 3890000,
+      image: 'https://m.media-amazon.com/images/I/61bK6PMOC3L._AC_SX679_.jpg',
+      category: 'smartphones', rating: 4.8, reviews: 12430, stock: 15,
+      tags: ['Dynamic Island', 'USB-C', '48MP'], isHot: true,
+      amazonUrl: 'https://www.amazon.com/dp/B0CHX1W1XY', asin: 'B0CHX1W1XY'
+    },
+    {
+      id: 2, name: 'Samsung Galaxy S24 Ultra 256GB', price: 4290000, originalPrice: 4790000,
+      image: 'https://m.media-amazon.com/images/I/71PvHfU6-pL._AC_SX679_.jpg',
+      category: 'smartphones', rating: 4.7, reviews: 8910, stock: 10,
+      tags: ['S Pen', '200MP', 'Titanium'], isNew: true,
+      amazonUrl: 'https://www.amazon.com/dp/B0CMDRCZBX', asin: 'B0CMDRCZBX'
+    },
+    {
+      id: 3, name: 'Sony WH-1000XM5 Auriculares Inalámbricos', price: 1190000, originalPrice: 1390000,
+      image: 'https://m.media-amazon.com/images/I/61+btxzpfDL._AC_SX679_.jpg',
+      category: 'audio', rating: 4.8, reviews: 22100, stock: 25,
+      tags: ['ANC', '30h batería', 'Hi-Res'], isHot: true,
+      amazonUrl: 'https://www.amazon.com/dp/B09XS7JWHH', asin: 'B09XS7JWHH'
+    },
+    {
+      id: 4, name: 'LG 27" Monitor UltraGear QHD 165Hz', price: 1490000, originalPrice: 1790000,
+      image: 'https://m.media-amazon.com/images/I/81SPCFzpVsL._AC_SX679_.jpg',
+      category: 'monitores', rating: 4.7, reviews: 5670, stock: 8,
+      tags: ['165Hz', '1ms', 'IPS', 'G-Sync'],
+      amazonUrl: 'https://www.amazon.com/dp/B08GH3XBJT', asin: 'B08GH3XBJT'
+    },
+    {
+      id: 5, name: 'Logitech MX Master 3S Mouse Inalámbrico', price: 490000, originalPrice: 590000,
+      image: 'https://m.media-amazon.com/images/I/614NzpiEVlL._AC_SX679_.jpg',
+      category: 'accesorios', rating: 4.8, reviews: 9870, stock: 30,
+      tags: ['8000 DPI', 'Silencioso', 'Multi-device'], isNew: true,
+      amazonUrl: 'https://www.amazon.com/dp/B09HM94VDS', asin: 'B09HM94VDS'
+    },
+    {
+      id: 6, name: 'Samsung 970 EVO Plus 1TB SSD NVMe', price: 390000, originalPrice: 490000,
+      image: 'https://m.media-amazon.com/images/I/81tJk8UjM4L._AC_SX679_.jpg',
+      category: 'almacenamiento', rating: 4.8, reviews: 18000, stock: 40,
+      tags: ['3500MB/s', 'M.2', 'PCIe 3.0'],
+      amazonUrl: 'https://www.amazon.com/dp/B07MFZY2F2', asin: 'B07MFZY2F2'
+    },
+    {
+      id: 7, name: 'Corsair K95 RGB Platinum Teclado Mecánico', price: 690000, originalPrice: 890000,
+      image: 'https://m.media-amazon.com/images/I/81r8t6JQAXL._AC_SX679_.jpg',
+      category: 'gaming', rating: 4.7, reviews: 6540, stock: 12,
+      tags: ['Cherry MX', 'RGB', 'Macro G-Keys'], isHot: true,
+      amazonUrl: 'https://www.amazon.com/dp/B07T6BXBKK', asin: 'B07T6BXBKK'
+    },
+    {
+      id: 8, name: 'Apple iPad Air M2 256GB WiFi', price: 2890000, originalPrice: 3190000,
+      image: 'https://m.media-amazon.com/images/I/71LvJl5VHEL._AC_SX679_.jpg',
+      category: 'tablets', rating: 4.9, reviews: 7230, stock: 6,
+      tags: ['M2 chip', 'Liquid Retina', 'USB-C'], isNew: true,
+      amazonUrl: 'https://www.amazon.com/dp/B0D3J9XDMQ', asin: 'B0D3J9XDMQ'
+    },
+    {
+      id: 9, name: 'Razer BlackShark V2 Pro Auriculares Gaming', price: 790000, originalPrice: 990000,
+      image: 'https://m.media-amazon.com/images/I/71B07mHZDvL._AC_SX679_.jpg',
+      category: 'audio', rating: 4.6, reviews: 4320, stock: 18,
+      tags: ['7.1 Surround', 'THX', 'Inalámbrico'],
+      amazonUrl: 'https://www.amazon.com/dp/B08QB39JMR', asin: 'B08QB39JMR'
+    },
+    {
+      id: 10, name: 'NVIDIA GeForce RTX 4070 Super', price: 3290000, originalPrice: 3690000,
+      image: 'https://m.media-amazon.com/images/I/71bOuEhqpkL._AC_SX679_.jpg',
+      category: 'componentes', rating: 4.8, reviews: 2100, stock: 4,
+      tags: ['DLSS 3', '12GB VRAM', 'Ray Tracing'], isHot: true,
+      amazonUrl: 'https://www.amazon.com/dp/B0CS3K3C3P', asin: 'B0CS3K3C3P'
+    },
+    {
+      id: 11, name: 'Elgato Stream Deck MK.2', price: 590000, originalPrice: 690000,
+      image: 'https://m.media-amazon.com/images/I/61RfAhSFmXL._AC_SX679_.jpg',
+      category: 'streaming', rating: 4.8, reviews: 11000, stock: 20,
+      tags: ['15 teclas LCD', 'Plugins', 'USB'],
+      amazonUrl: 'https://www.amazon.com/dp/B09738CV2G', asin: 'B09738CV2G'
+    },
+    {
+      id: 12, name: 'Secretlab TITAN Evo Silla Gamer', price: 1890000, originalPrice: 2190000,
+      image: 'https://m.media-amazon.com/images/I/71TBaxQakwL._AC_SX679_.jpg',
+      category: 'muebles', rating: 4.7, reviews: 3240, stock: 5,
+      tags: ['Lumbar 4D', 'Cuero sintético', 'Reclina 165°'],
+      amazonUrl: 'https://www.amazon.com/dp/B09TPJQ8QN', asin: 'B09TPJQ8QN'
+    },
   ];
 
-  readonly categories = ['all','gaming','audio','monitores','componentes','almacenamiento','streaming','accesorios','muebles'];
+  readonly categories = ['all','smartphones','tablets','gaming','audio','monitores',
+                          'componentes','almacenamiento','streaming','accesorios','muebles'];
 
   readonly filtered = computed(() => {
     let list = this.PRODUCTS;
-    const q = this._search().toLowerCase();
+    const q   = this._search().toLowerCase();
     const cat = this._category();
     if (cat !== 'all') list = list.filter(p => p.category === cat);
     if (q) list = list.filter(p =>

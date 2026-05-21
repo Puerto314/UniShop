@@ -11,6 +11,8 @@ export interface ProductItem {
   tags?: string[];
   isNew?: boolean;
   isHot?: boolean;
+  amazonUrl?: string;
+  asin?: string;
 }
 
 export interface CartItem {
@@ -35,25 +37,17 @@ export interface Order {
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
 }
 
-export interface CouponResult {
-  success: boolean;
-  message: string;
-  discount?: number;
-}
-
 export interface ToastMessage {
   id: number;
   type: 'success' | 'error' | 'info' | 'warning';
   message: string;
 }
 
-// ── Modelos Amazon ────────────────────────────────────────────────────────────
+// ── Modelos Amazon ─────────────────────────────────────────────────────────────
 
-/** Un producto devuelto por el backend desde Amazon.com (precio en USD). */
 export interface AmazonProduct {
   asin: string;
   title: string;
-  /** Precio en USD (ej: 12.99). 0 = no disponible. */
   price: number;
   url: string;
   imageUrl?: string;
@@ -61,12 +55,10 @@ export interface AmazonProduct {
   reviewCount?: number;
 }
 
-/** Respuesta del endpoint GET /producto/buscar?nombre=... */
 export interface BuscarResponse {
   amazon: AmazonProduct[];
 }
 
-/** Una reseña devuelta por GET /producto/resenas?asin=... */
 export interface AmazonReview {
   author: string;
   title?: string;

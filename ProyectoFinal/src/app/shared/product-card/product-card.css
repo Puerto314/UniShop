@@ -131,3 +131,11 @@
   background: rgba(0,255,136,.1);
   animation: neonPulse 1s ease;
 }
+
+.pc-amazon-hint {
+  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+  background: rgba(255,153,0,.9); color: #000; font-size:.72rem; font-weight:700;
+  padding: 4px 10px; border-radius: 20px; white-space: nowrap;
+  opacity: 0; transition: opacity .2s;
+}
+.pc-img-wrap:hover .pc-amazon-hint { opacity: 1; }

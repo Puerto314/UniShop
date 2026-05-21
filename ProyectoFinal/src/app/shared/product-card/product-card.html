@@ -8,17 +8,19 @@
   </div>
 
   <!-- Wishlist -->
-  <button class="pc-wish" (click)="onWishlist()" [class.active]="wishlisted" title="Favoritos">
+  <button class="pc-wish" (click)="onWishlist(); $event.stopPropagation()" [class.active]="wishlisted" title="Favoritos">
     {{ wishlisted ? '❤️' : '🤍' }}
   </button>
 
-  <!-- Image -->
-  <div class="pc-img-wrap" (click)="quickView.emit(product)">
-    <img [src]="product.image" [alt]="product.name" class="pc-img" loading="lazy" />
+  <!-- Image (click abre quick view) -->
+  <div class="pc-img-wrap" (click)="quickView.emit(product); $event.stopPropagation()">
+    <img [src]="product.image" [alt]="product.name" class="pc-img" loading="lazy"
+         (error)="$any($event.target).src='https://placehold.co/400x300/111/00f5ff?text=IMG'" />
     <div class="pc-overlay">
       <button class="pc-quick">👁 Vista Rápida</button>
     </div>
     <div class="pc-stock-overlay" *ngIf="product.stock === 0">SIN STOCK</div>
+    <div class="pc-amazon-hint" *ngIf="product.amazonUrl">🛍️ Click para ver en Amazon</div>
   </div>
 
   <!-- Body -->
@@ -26,7 +28,6 @@
     <span class="pc-category">{{ product.category }}</span>
     <h3 class="pc-name">{{ product.name }}</h3>
 
-    <!-- Rating -->
     <div class="pc-rating">
       <span class="stars">
         <span *ngFor="let s of stars" [class.filled]="s === '★'">{{ s }}</span>
@@ -35,29 +36,23 @@
       <span class="rating-count">({{ product.reviews }})</span>
     </div>
 
-    <!-- Tags -->
     <div class="pc-tags" *ngIf="product.tags?.length">
       <span class="pc-tag" *ngFor="let t of product.tags">{{ t }}</span>
     </div>
 
-    <!-- Price -->
     <div class="pc-price-row">
       <span class="pc-price">{{ formatPrice(product.price) }}</span>
       <span class="pc-original" *ngIf="product.originalPrice">{{ formatPrice(product.originalPrice) }}</span>
     </div>
 
-    <!-- Stock indicator -->
     <div class="pc-stock" *ngIf="product.stock > 0 && product.stock <= 5">
       <span class="stock-dot"></span> ¡Solo {{ product.stock }} disponibles!
     </div>
 
-    <!-- Add to cart -->
-    <button
-      class="pc-add-btn"
-      [class.added]="added"
-      [disabled]="product.stock === 0"
-      (click)="onAdd()"
-    >
+    <!-- Add to cart stops propagation so it doesn't open Amazon -->
+    <button class="pc-add-btn" [class.added]="added"
+            [disabled]="product.stock === 0"
+            (click)="onAdd(); $event.stopPropagation()">
       <span *ngIf="!added">🛒 Agregar al Carrito</span>
       <span *ngIf="added">✅ ¡Agregado!</span>
     </button>
