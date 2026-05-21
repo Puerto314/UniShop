@@ -32,7 +32,7 @@
             TOTAL: <span class="neon-cyan">{{ formatPrice(order.total) }}</span>
           </div>
           <div class="oc-actions">
-            <button class="btn btn-ghost btn-sm">🧾 Factura</button>
+            <button class="btn btn-ghost btn-sm" (click)="verFactura(order)">🧾 Ver Factura</button>
             <button class="btn btn-outline-cyan btn-sm" (click)="reorder(order.id)">🔄 Reordenar</button>
           </div>
         </div>
@@ -47,5 +47,68 @@
         <a routerLink="/home" class="btn btn-cyan mt-16">Ir a la Tienda</a>
       </div>
     </ng-template>
+  </div>
+</div>
+
+<!-- ======= MODAL FACTURA ======= -->
+<div class="factura-overlay" *ngIf="facturaOrder" (click)="cerrarFactura()">
+  <div class="factura-modal" (click)="$event.stopPropagation()">
+    <button class="factura-close" (click)="cerrarFactura()">✕</button>
+
+    <div class="factura-header">
+      <div class="factura-logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">UNISHOP</span>
+      </div>
+      <div class="factura-meta">
+        <div class="fm-row"><span>Factura N°:</span><strong class="neon-cyan">{{ facturaOrder.id }}</strong></div>
+        <div class="fm-row"><span>Fecha:</span><strong>{{ formatDate(facturaOrder.date) }}</strong></div>
+        <div class="fm-row"><span>Estado:</span>
+          <strong [style.color]="orderService.statusColor(facturaOrder.status)">
+            {{ orderService.statusLabel(facturaOrder.status) }}
+          </strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="factura-divider"></div>
+
+    <h3 class="factura-section-title">📦 Detalle de Productos</h3>
+    <div class="factura-table">
+      <div class="ft-head">
+        <span>Producto</span><span>Cat.</span><span>Rating</span><span>Cant.</span><span>P.Unit</span><span>Total</span>
+      </div>
+      <div class="ft-row" *ngFor="let item of facturaOrder.items">
+        <span class="ft-name">{{ item.product.name }}</span>
+        <span class="ft-cat">{{ item.product.category }}</span>
+        <span class="ft-rating">{{ item.product.rating }}★</span>
+        <span class="ft-qty">{{ item.qty }}</span>
+        <span class="ft-price">{{ formatPrice(item.product.price) }}</span>
+        <span class="ft-total neon-cyan">{{ formatPrice(item.product.price * item.qty) }}</span>
+      </div>
+    </div>
+
+    <div class="factura-divider"></div>
+
+    <div class="factura-totales">
+      <div class="factura-total-row">
+        <span>Subtotal</span>
+        <span>{{ formatPrice(facturaOrder.total) }}</span>
+      </div>
+      <div class="factura-total-row">
+        <span>Envío</span>
+        <span class="neon-green">GRATIS</span>
+      </div>
+      <div class="factura-total-row factura-grand-total">
+        <span>TOTAL PAGADO</span>
+        <span class="neon-cyan">{{ formatPrice(facturaOrder.total) }}</span>
+      </div>
+    </div>
+
+    <div class="factura-footer">
+      <p>🛡️ Garantía de 12 meses en todos los productos · UniShop © {{ currentYear }}</p>
+      <p>Gracias por tu compra. Para soporte: soporte@unishop.co</p>
+      <button class="btn btn-cyan btn-sm" onclick="window.print()">🖨️ Imprimir Factura</button>
+    </div>
   </div>
 </div>

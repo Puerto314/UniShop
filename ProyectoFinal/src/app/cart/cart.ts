@@ -18,23 +18,18 @@ import { NotificationService } from '../services/notification.service';
         style({ transform: 'translateX(100%)' }),
         animate('350ms cubic-bezier(.4,0,.2,1)', style({ transform: 'translateX(0)' }))
       ]),
-      transition(':leave', [
-        animate('280ms ease', style({ transform: 'translateX(100%)' }))
-      ])
+      transition(':leave', [animate('280ms ease', style({ transform: 'translateX(100%)' }))])
     ]),
     trigger('itemAnim', [
       transition(':enter', [
         style({ opacity: 0, transform: 'translateX(30px)' }),
         animate('250ms ease', style({ opacity: 1, transform: 'translateX(0)' }))
       ]),
-      transition(':leave', [
-        animate('200ms ease', style({ opacity: 0, transform: 'translateX(30px)' }))
-      ])
+      transition(':leave', [animate('200ms ease', style({ opacity: 0, transform: 'translateX(30px)' }))])
     ])
   ]
 })
 export class Cart {
-  couponCode = '';
   checkingOut = signal(false);
 
   constructor(
@@ -42,13 +37,6 @@ export class Cart {
     private orders: OrderService,
     private notify: NotificationService,
   ) {}
-
-  applyCoupon() {
-    if (!this.couponCode.trim()) return;
-    const r = this.cartService.applyCoupon(this.couponCode.trim());
-    r.success ? this.notify.success(r.message) : this.notify.error(r.message);
-    if (r.success) this.couponCode = '';
-  }
 
   checkout() {
     if (!this.cartService.items().length) return;
@@ -58,7 +46,7 @@ export class Cart {
       this.cartService.clearCart();
       this.cartService.closeCart();
       this.checkingOut.set(false);
-      this.notify.success(`Pedido ${order.id} realizado. ¡Gracias!`);
+      this.notify.success(`Pedido ${order.id} realizado. ¡Gracias por tu compra!`);
     }, 1800);
   }
 

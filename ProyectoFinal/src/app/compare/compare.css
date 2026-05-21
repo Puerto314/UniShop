@@ -408,3 +408,19 @@
   .product-grid     { grid-template-columns: 1fr; }
   .card-img-wrap    { height: 180px; }
 }
+
+/* ── Botón añadir al carrito en comparador ───────────────────────────── */
+.btn-carrito {
+  display: block; width: 100%;
+  padding: 9px 14px; border-radius: 8px;
+  background: linear-gradient(135deg, var(--cyan), #00b4d8);
+  color: var(--black); font-weight: 700; font-size: .82rem;
+  border: none; cursor: pointer;
+  transition: opacity .2s, transform .1s;
+  margin-top: 6px;
+}
+.btn-carrito:hover { opacity: .85; transform: translateY(-1px); }
+.price-usd {
+  display: block; font-size: .75rem;
+  color: rgba(255,255,255,.4); margin-top: 2px;
+}

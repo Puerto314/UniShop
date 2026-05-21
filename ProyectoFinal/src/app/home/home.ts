@@ -26,22 +26,26 @@ import { ProductItem } from '../models';
   ]
 })
 export class Home implements OnInit, OnDestroy {
-  carouselIdx  = signal(0);
-  heroBanners  = [
-    { tag: 'OFERTA LIMITADA', title: 'RTX 5070 Ti', sub: 'La GPU más potente del año a precio de lanzamiento', color: 'var(--magenta)', cta: 'Ver Oferta', img: '🎮' },
-    { tag: 'NUEVO STOCK',     title: 'Monitor 165Hz IPS 27"', sub: 'Colores vívidos, respuesta de 1ms. Gaming en su máxima expresión', color: 'var(--cyan)',    cta: 'Comprar Ahora', img: '🖥️' },
-    { tag: 'BEST SELLER',     title: 'Setup Completo', sub: 'Teclado + Mouse + Audífonos RGB. El bundle que todos quieren', color: 'var(--yellow)',  cta: 'Ver Bundle', img: '⌨️' },
+  carouselIdx = signal(0);
+  heroBanners = [
+    { tag: 'OFERTA LIMITADA', title: 'iPhone 15', sub: 'Dynamic Island, USB-C y cámara de 48MP. El iPhone más avanzado.', color: 'var(--magenta)', cta: 'Ver Oferta', img: '📱' },
+    { tag: 'NUEVO STOCK',     title: 'Galaxy S24 Ultra', sub: 'S Pen integrado, 200MP y titanio. El rey de los Android.', color: 'var(--cyan)',    cta: 'Comprar Ahora', img: '🌟' },
+    { tag: 'BEST SELLER',     title: 'Sony WH-1000XM5', sub: 'Los mejores auriculares con cancelación de ruido del mercado.', color: 'var(--yellow)', cta: 'Ver Oferta', img: '🎧' },
   ];
   private carouselTimer: any;
 
-  sortBy = signal<'default'|'price-asc'|'price-desc'|'rating'|'newest'>('default');
-  wishlist = signal<number[]>([]);
+  sortBy      = signal<'default'|'price-asc'|'price-desc'|'rating'|'newest'>('default');
+  wishlist    = signal<number[]>([]);
   quickViewProduct = signal<ProductItem | null>(null);
   showFilters = signal(false);
-  priceMax = signal(3500000);
+  priceMax    = signal(5000000);
+  hotOnly     = signal(false);
+  newOnly     = signal(false);
 
   sortedProducts = computed(() => {
-    let list = [...this.products.filtered()];
+    let list = [...this.products.filtered()].filter(p => p.price <= this.priceMax());
+    if (this.hotOnly()) list = list.filter(p => p.isHot);
+    if (this.newOnly()) list = list.filter(p => p.isNew);
     switch (this.sortBy()) {
       case 'price-asc':  return list.sort((a,b) => a.price - b.price);
       case 'price-desc': return list.sort((a,b) => b.price - a.price);
@@ -50,6 +54,18 @@ export class Home implements OnInit, OnDestroy {
       default:           return list;
     }
   });
+
+  readonly catIcon: Record<string,string> = {
+    all:'🌐', smartphones:'📱', tablets:'📟', gaming:'🎮', audio:'🎧',
+    monitores:'🖥️', componentes:'⚙️', almacenamiento:'💾',
+    streaming:'📡', accesorios:'🔌', muebles:'🪑'
+  };
+  readonly catLabel: Record<string,string> = {
+    all:'Todos', smartphones:'Smartphones', tablets:'Tablets', gaming:'Gaming',
+    audio:'Audio', monitores:'Monitores', componentes:'Componentes',
+    almacenamiento:'Almacenamiento', streaming:'Streaming',
+    accesorios:'Accesorios', muebles:'Muebles'
+  };
 
   constructor(
     public products: ProductService,
@@ -62,11 +78,14 @@ export class Home implements OnInit, OnDestroy {
       this.carouselIdx.update(i => (i + 1) % this.heroBanners.length);
     }, 4500);
   }
-
   ngOnDestroy() { clearInterval(this.carouselTimer); }
 
   nextSlide() { this.carouselIdx.update(i => (i + 1) % this.heroBanners.length); }
   prevSlide() { this.carouselIdx.update(i => (i - 1 + this.heroBanners.length) % this.heroBanners.length); }
+
+  openAmazon(product: ProductItem) {
+    if (product.amazonUrl) window.open(product.amazonUrl, '_blank');
+  }
 
   onAddToCart(product: ProductItem) {
     this.cart.addToCart(product);
@@ -90,16 +109,14 @@ export class Home implements OnInit, OnDestroy {
     if (p) { this.onAddToCart(p); this.closeQuickView(); }
   }
 
+  filterHot()   { this.hotOnly.set(true);  this.newOnly.set(false); }
+  filterNew()   { this.newOnly.set(true);  this.hotOnly.set(false); }
+  clearFilter() { this.hotOnly.set(false); this.newOnly.set(false); }
+
   formatPrice(p: number) { return '$' + p.toLocaleString('es-CO'); }
   discount(p: ProductItem) {
     if (!p.originalPrice) return 0;
     return Math.round((1 - p.price / p.originalPrice) * 100);
   }
-
-  get catIcon(): Record<string,string> {
-    return { all:'🌐', gaming:'🎮', audio:'🎧', monitores:'🖥️', componentes:'⚙️',
-             almacenamiento:'💾', streaming:'📡', accesorios:'🔌', muebles:'🪑' };
-  }
-
   trackFn(_: number, p: ProductItem) { return p.id; }
 }

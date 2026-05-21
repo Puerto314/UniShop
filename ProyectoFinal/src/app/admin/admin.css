@@ -69,3 +69,22 @@
 }
 .no-access h2 { font-size: 2.5rem; }
 .no-access p  { color: var(--gray); }
+
+/* ── Users tab ─────────────────────────────────────────────────────────── */
+.user-form-card {
+  background: rgba(255,255,255,.03); border: 1px solid rgba(0,245,255,.15);
+  border-radius: 12px; padding: 24px; margin-bottom: 24px;
+}
+.user-form-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px; margin-bottom: 16px;
+}
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size:.82rem; color: rgba(255,255,255,.5); }
+.form-actions { display: flex; gap: 10px; align-items: center; }
+.form-error { color: var(--red); font-size:.85rem; margin-top:8px; }
+.as-logout {
+  margin-top: auto; padding: 16px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.as-nav { flex: 1; display: flex; flex-direction: column; gap: 4px; }

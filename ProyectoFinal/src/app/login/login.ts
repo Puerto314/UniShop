@@ -104,13 +104,13 @@ export class Login {
   }
 
   loginAsAdmin() {
-    this.loginEmail    = 'admin@neon.co';
+    this.loginEmail    = 'admin@unishop.co';
     this.loginPassword = 'Admin123!';
     this.login();
   }
 
   loginAsClient() {
-    this.loginEmail    = 'demo@neon.co';
+    this.loginEmail    = 'demo@unishop.co';
     this.loginPassword = 'Demo1234!';
     this.login();
   }

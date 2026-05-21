@@ -4,21 +4,13 @@
     <!-- Logo -->
     <a routerLink="/home" class="nb-logo">
       <span class="logo-icon">⚡</span>
-      <span class="logo-text">NEON<span>MARKET</span></span>
+      <span class="logo-text">UNI<span>SHOP</span></span>
     </a>
 
-    <!-- Search -->
-    <div class="nb-search">
+    <!-- Comparador como barra principal -->
+    <div class="nb-search" (click)="goToCompare()" title="Buscar y comparar precios en Amazon">
       <span class="search-icon">🔍</span>
-      <input
-        class="search-input"
-        type="text"
-        placeholder="Buscar productos, marcas..."
-        [(ngModel)]="searchQuery"
-        (input)="search()"
-        (keyup.enter)="search()"
-      />
-      <button *ngIf="searchQuery" class="search-clear" (click)="clearSearch()">✕</button>
+      <span class="search-placeholder">Buscar y comparar precios en Amazon...</span>
     </div>
 
     <!-- Right actions -->
@@ -31,7 +23,7 @@
           <a *ngFor="let cat of products.categories" class="dd-item"
              (click)="products.setCategory(cat); mobileOpen.set(false)"
              routerLink="/home">
-            {{ cat === 'all' ? '🌐 Todos' : cat }}
+            {{ catLabels[cat] || cat }}
           </a>
         </div>
       </div>
@@ -84,7 +76,7 @@
     <a routerLink="/compare" class="mob-link" (click)="mobileOpen.set(false)">🔍 Comparar</a>
     <a routerLink="/history" class="mob-link" (click)="mobileOpen.set(false)">Mis Pedidos</a>
     <a *ngIf="auth.isAdmin()" routerLink="/admin" class="mob-link" (click)="mobileOpen.set(false)">Admin</a>
-    <button class="mob-link mob-logout" (click)="logout(); mobileOpen.set(false)">Cerrar Sesión</button>
+    <button class="mob-link mob-logout" (click)="logout(); mobileOpen.set(false)">🚪 Cerrar Sesión</button>
   </div>
 </header>
 <div class="nb-spacer"></div>

@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { OrderService } from '../services/order.service';
 import { CartService } from '../services/cart.service';
 import { NotificationService } from '../services/notification.service';
+import { Order } from '../models';
 
 @Component({
   selector: 'app-history',
@@ -13,6 +14,9 @@ import { NotificationService } from '../services/notification.service';
   styleUrl: './history.css',
 })
 export class History {
+  facturaOrder: Order | null = null;
+  readonly currentYear = new Date().getFullYear();
+
   constructor(
     public orderService: OrderService,
     public cart: CartService,
@@ -26,6 +30,9 @@ export class History {
     this.cart.openCart();
     this.notify.success('Productos del pedido agregados al carrito');
   }
+
+  verFactura(order: Order) { this.facturaOrder = order; }
+  cerrarFactura()           { this.facturaOrder = null; }
 
   formatPrice(p: number) { return '$' + p.toLocaleString('es-CO'); }
   formatDate(d: string)  { return new Date(d).toLocaleDateString('es-CO', { year:'numeric', month:'long', day:'numeric' }); }

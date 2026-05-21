@@ -202,3 +202,10 @@
 .qv-stock { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: .8rem; }
 .stock-dot { width: 8px; height: 8px; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
 @media(max-width:680px) { .qv-modal{flex-direction:column} .qv-img-side{width:100%;height:200px} }
+
+/* Product card Amazon click wrapper */
+.product-card-wrapper {
+  cursor: pointer;
+  transition: transform .15s;
+}
+.product-card-wrapper:hover { transform: translateY(-2px); }
