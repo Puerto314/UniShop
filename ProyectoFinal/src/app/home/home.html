@@ -4,10 +4,10 @@
   <div class="ticker-bar">
     <div class="ticker-track">
       <span *ngFor="let _ of [1,2,3,4]">
-        ⚡ ENVÍO GRATIS en compras +$150.000 &nbsp;|&nbsp;
-        🔥 iPhone 15 disponible &nbsp;|&nbsp;
-        🛡️ Garantía 12 meses &nbsp;|&nbsp;
-        🔍 Compara precios en Amazon &nbsp;|&nbsp;
+        ⚡ Compare precios de sus productos favoritos de amazon &nbsp;|&nbsp;
+        🔥 Compre bueno, bonito y barato &nbsp;|&nbsp;
+        🛡️ Garantía a sus productos por 12 meses &nbsp;|&nbsp;
+        🔍 Busque cualquier producto &nbsp;|&nbsp;
       </span>
     </div>
   </div>
@@ -29,7 +29,7 @@
       </div>
       <div class="hs-emoji">{{ b.img }}</div>
     </div>
-    <button class="hero-arrow left"  (click)="prevSlide()">❮</button>
+    <button class="hero-arrow left" (click)="prevSlide()">❮</button>
     <button class="hero-arrow right" (click)="nextSlide()">❯</button>
     <div class="hero-dots">
       <button *ngFor="let b of heroBanners; let i = index"
@@ -43,9 +43,9 @@
     <div class="container">
       <div class="cat-row">
         <button *ngFor="let cat of products.categories"
-          class="cat-pill"
-          [class.active]="products.activeCategory() === cat"
-          (click)="products.setCategory(cat)">
+                class="cat-pill"
+                [class.active]="products.activeCategory() === cat"
+                (click)="products.setCategory(cat)">
           {{ catIcon[cat] }} {{ catLabel[cat] || cat }}
         </button>
       </div>
@@ -60,7 +60,8 @@
       <div class="toolbar">
         <div class="toolbar-left">
           <h2 class="section-title">
-            <span class="neon-cyan">{{ products.activeCategory() === 'all' ? 'TODOS LOS PRODUCTOS' : (catLabel[products.activeCategory()] || products.activeCategory()).toUpperCase() }}</span>
+            <span
+              class="neon-cyan">{{ products.activeCategory() === 'all' ? 'TODOS LOS PRODUCTOS' : (catLabel[products.activeCategory()] || products.activeCategory()).toUpperCase() }}</span>
             <span class="product-count">({{ sortedProducts().length }})</span>
           </h2>
         </div>
@@ -82,14 +83,14 @@
           <label>Precio máximo: {{ formatPrice(priceMax()) }}</label>
           <input type="range" min="100000" max="5000000" step="100000"
                  [value]="priceMax()" (input)="priceMax.set(+$any($event.target).value)"
-                 class="range-input" />
+                 class="range-input"/>
         </div>
         <div class="filter-group">
           <label>Solo destacados</label>
           <div class="filter-badges">
             <button class="badge badge-magenta cursor-pointer" (click)="filterHot()">🔥 HOT</button>
-            <button class="badge badge-cyan cursor-pointer"    (click)="filterNew()">✨ NEW</button>
-            <button class="badge badge-green cursor-pointer"   (click)="clearFilter()">Todos</button>
+            <button class="badge badge-cyan cursor-pointer" (click)="filterNew()">✨ NEW</button>
+            <button class="badge badge-green cursor-pointer" (click)="clearFilter()">Todos</button>
           </div>
         </div>
       </div>
@@ -122,32 +123,7 @@
   </section>
 
   <!-- ======= PROMO BANNERS ======= -->
-  <section class="promo-section">
-    <div class="container">
-      <div class="promo-grid">
-        <div class="promo-card promo-cyan">
-          <div class="promo-icon">🚀</div>
-          <h3>Envío Express</h3>
-          <p>Recibe en 24h en Bogotá, Medellín y Cali</p>
-        </div>
-        <div class="promo-card promo-magenta">
-          <div class="promo-icon">🛡️</div>
-          <h3>Garantía Total</h3>
-          <p>12 meses de garantía en todos los productos</p>
-        </div>
-        <div class="promo-card promo-yellow">
-          <div class="promo-icon">💳</div>
-          <h3>Cuotas sin interés</h3>
-          <p>Hasta 36 cuotas con Tarjeta de Crédito</p>
-        </div>
-        <div class="promo-card promo-green">
-          <div class="promo-icon">🔍</div>
-          <h3>Comparador de Precios</h3>
-          <p>Compara productos en Amazon en tiempo real</p>
-        </div>
-      </div>
-    </div>
-  </section>
+
 
 </div>
 
@@ -157,10 +133,10 @@
     <button class="qv-close" (click)="closeQuickView()">✕</button>
     <ng-container *ngIf="quickViewProduct() as p">
       <div class="qv-img-side">
-        <img [src]="p.image" [alt]="p.name" />
+        <img [src]="p.image" [alt]="p.name"/>
         <div class="qv-badges">
           <span class="badge badge-magenta" *ngIf="p.isHot">🔥 HOT</span>
-          <span class="badge badge-cyan"    *ngIf="p.isNew">✨ NEW</span>
+          <span class="badge badge-cyan" *ngIf="p.isNew">✨ NEW</span>
         </div>
       </div>
       <div class="qv-info">
