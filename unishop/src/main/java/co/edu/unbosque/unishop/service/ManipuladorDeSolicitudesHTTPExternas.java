@@ -16,10 +16,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+
 
 import co.edu.unbosque.unishop.dto.AmazonItemDTO;
 import co.edu.unbosque.unishop.dto.AmazonReviewDTO;
