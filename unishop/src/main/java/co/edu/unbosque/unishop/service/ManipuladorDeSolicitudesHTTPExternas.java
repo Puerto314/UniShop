@@ -48,7 +48,6 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 	// ── Búsqueda principal con reintentos ─────────────────────────────────
 
 	public static List<AmazonItemDTO> buscarEnAmazon(String nombreProducto) {
-		// Intentar múltiples variantes de búsqueda para maximizar resultados
 		List<String> variantes = generarVariantesBusqueda(nombreProducto);
 
 		for (String variante : variantes) {
@@ -62,11 +61,9 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 		return new ArrayList<>();
 	}
 
-	/** Genera variantes de la búsqueda para aumentar probabilidad de éxito */
 	private static List<String> generarVariantesBusqueda(String query) {
 		List<String> variantes = new ArrayList<>();
 		variantes.add(query.trim());
-		// Variante en inglés para términos comunes en español
 		String lower = query.trim().toLowerCase();
 		if (lower.contains("iphone")) {
 			variantes.add("Apple iPhone " + lower.replace("iphone", "").trim());
@@ -80,24 +77,20 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 			variantes.add("gaming headset wireless");
 		if (lower.contains("monitor"))
 			variantes.add("gaming monitor 27 inch");
-		// Versión simplificada (primera palabra)
 		String[] palabras = query.trim().split("\\s+");
 		if (palabras.length > 1)
 			variantes.add(palabras[0]);
 		return variantes;
 	}
 
-	/** Intenta la búsqueda hasta maxReintentos veces con distintos UA y delays */
 	private static List<AmazonItemDTO> intentarBusqueda(String query, int maxReintentos) {
 		for (int intento = 0; intento < maxReintentos; intento++) {
 			try {
 				if (intento > 0) {
-					// Esperar entre 1 y 3 segundos entre reintentos
 					Thread.sleep(1000 + RANDOM.nextInt(2000));
 				}
 				String q = URLEncoder.encode(query.trim(), StandardCharsets.UTF_8);
 				String url = "https://www.amazon.com/s?k=" + q + "&language=en_US";
-
 
 				HttpResponse<String> r = HTTP_CLIENT.send(buildRequest(url, getRandomUA()),
 						HttpResponse.BodyHandlers.ofString());
@@ -107,7 +100,6 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 					List<AmazonItemDTO> result = parsearBusqueda(r.body());
 					if (!result.isEmpty())
 						return result;
-					// Si da 200 pero sin productos, intentar con otro UA
 					System.out.println("200 OK pero sin productos, reintentando...");
 				} else if (r.statusCode() == 503 || r.statusCode() == 429) {
 					System.err.println("Amazon devolvio " + r.statusCode() + ", reintentando en breve...");
@@ -128,26 +120,53 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 	// ── Reseñas con reintento ─────────────────────────────────────────────
 
 	public static List<AmazonReviewDTO> obtenerResenasAmazon(String asin) {
-		for (int intento = 0; intento < 2; intento++) {
-			try {
-				if (intento > 0)
-					Thread.sleep(1500);
-				String url = "https://www.amazon.com/product-reviews/" + asin
-						+ "?sortBy=recent&reviewerType=all_reviews&language=en_US";
+		List<String> urls = List.of(
+			"https://www.amazon.com/product-reviews/" + asin
+				+ "?sortBy=recent&reviewerType=all_reviews&language=en_US",
+			"https://www.amazon.com/dp/" + asin + "#customerReviews"
+		);
 
-				HttpResponse<String> r = HTTP_CLIENT.send(buildRequest(url, getRandomUA()),
-						HttpResponse.BodyHandlers.ofString());
-				System.out.println("Amazon /reviews [" + asin + "] status -> " + r.statusCode());
+		for (String url : urls) {
+			for (int intento = 0; intento < 3; intento++) {
+				try {
+					if (intento > 0)
+						Thread.sleep(1500 + RANDOM.nextInt(2000));
 
-				if (r.statusCode() == 200) {
-					List<AmazonReviewDTO> result = parsearResenas(r.body());
-					System.out.println("Reseñas encontradas: " + result.size());
-					return result;
+					HttpResponse<String> r = HTTP_CLIENT.send(buildRequest(url, getRandomUA()),
+							HttpResponse.BodyHandlers.ofString());
+					System.out.println("Amazon /reviews [" + asin + "] intento " + (intento + 1)
+							+ " status=" + r.statusCode());
+
+					String responseBody = r.body();
+
+					if (r.statusCode() == 200) {
+						if (responseBody.contains("robot check") || responseBody.contains("Type the characters")
+								|| responseBody.contains("api-services-support@amazon.com")) {
+							System.err.println("CAPTCHA detectado en reviews, reintentando con otro UA...");
+							Thread.sleep(2000 + RANDOM.nextInt(3000));
+							continue;
+						}
+						List<AmazonReviewDTO> result = parsearResenas(responseBody);
+						if (!result.isEmpty()) {
+							System.out.println("Reseñas encontradas: " + result.size());
+							return result;
+						}
+						System.out.println("200 OK pero sin reseñas parseadas.");
+					} else if (r.statusCode() == 503 || r.statusCode() == 429) {
+						System.err.println("Rate-limit (" + r.statusCode() + "), esperando...");
+						Thread.sleep(3000 + RANDOM.nextInt(4000));
+					} else {
+						System.err.println("Amazon reviews respondio " + r.statusCode());
+					}
+				} catch (InterruptedException ie) {
+					Thread.currentThread().interrupt();
+					return new ArrayList<>();
+				} catch (Exception e) {
+					System.err.println("obtenerResenasAmazon error (intento " + (intento + 1) + "): " + e.getMessage());
 				}
-			} catch (Exception e) {
-				System.err.println("obtenerResenasAmazon error: " + e.getMessage());
 			}
 		}
+		System.err.println("No se pudieron obtener reseñas para ASIN: " + asin);
 		return new ArrayList<>();
 	}
 
@@ -207,54 +226,92 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 	private static List<AmazonReviewDTO> parsearResenas(String html) {
 		List<AmazonReviewDTO> lista = new ArrayList<>();
 
-		Pattern pBloque = Pattern.compile("data-hook=\"review\"(.*?)(?=data-hook=\"review\"|</ol>|id=\"reviews-medley)",
-				Pattern.DOTALL);
-		Pattern pAuthor = Pattern.compile("class=\"a-profile-name\"[^>]*>([^<]+)<");
-		Pattern pTitle = Pattern.compile("data-hook=\"review-title\"[^>]*>[^<]*<span[^>]*>([^<]{3,200})");
-		Pattern pBody = Pattern.compile("data-hook=\"review-body\"[^>]*>\\s*<span[^>]*>([\\s\\S]{10,2000})</span>");
-		Pattern pRating = Pattern.compile("([0-9\\.]+) out of 5 stars");
-		Pattern pDate = Pattern.compile("data-hook=\"review-date\"[^>]*>([^<]{5,80})<");
+		if (html.contains("robot check") || html.contains("Type the characters")
+				|| html.contains("api-services-support@amazon.com")) {
+			System.err.println("Amazon reviews: pagina de verificacion (CAPTCHA).");
+			return lista;
+		}
 
-		Matcher bm = pBloque.matcher(html);
+		// Dividir en bloques por cada div de review
+		String[] partes = html.split("(?=<div[^>]+data-hook=\"review\")");
+
+		// --- Patrones ajustados al HTML real de Amazon (verificado Mayo 2025) ---
+		//
+		// Amazon usa data-hook="reviewTitle" (camelCase, sin guion) dentro de <h5>
+		// NO usa data-hook="review-title" como se esperaba antes.
+		// El rating viene en data-hook="review-star-rating" en el <i>, texto en span.a-icon-alt
+		// El body sigue usando data-hook="review-body" con estructura div>span>span
+		//
+		Pattern pAuthor  = Pattern.compile("class=\"a-profile-name\"[^>]*>([^<]+)<");
+
+		// Titulo: data-hook="reviewTitle" en <h5> — el texto es hijo directo del tag
+		Pattern pTitle   = Pattern.compile("data-hook=[\"']reviewTitle[\"'][^>]*>([^<]{3,400})<",
+				Pattern.DOTALL);
+
+		// Rating: data-hook="review-star-rating" en <i>, texto "N out of 5 stars" en span hijo
+		Pattern pRating  = Pattern.compile(
+				"data-hook=[\"']review-star-rating[\"'][^>]*>[\\s\\S]*?<span[^>]*>([0-9.]+) out of [0-9.]+ stars",
+				Pattern.DOTALL);
+		// Fallback: cualquier "N out of 5 stars" en el bloque
+		Pattern pRatingFb = Pattern.compile("([0-9.]+) out of [0-9.]+ stars");
+
+		// Body: data-hook="review-body", texto dentro de span>span (o span directo como fallback)
+		Pattern pBodyDouble = Pattern.compile(
+				"data-hook=[\"']review-body[\"'][^>]*>[\\s\\S]*?<span[^>]*>\\s*<span[^>]*>([\\s\\S]+?)</span>\\s*</span>",
+				Pattern.DOTALL);
+		Pattern pBodySingle = Pattern.compile(
+				"data-hook=[\"']review-body[\"'][^>]*>[\\s\\S]*?<span[^>]*>([\\s\\S]{10,3000}?)</span>",
+				Pattern.DOTALL);
+
+		Pattern pDate    = Pattern.compile("data-hook=[\"']review-date[\"'][^>]*>([^<]{5,100})<");
+
 		int count = 0;
-		while (bm.find() && count < 10) {
-			String bloque = bm.group(1);
+		for (String bloque : partes) {
+			if (count >= 10) break;
+			if (!bloque.contains("data-hook=\"review\"") && !bloque.contains("data-hook='review'")) continue;
+
 			AmazonReviewDTO rev = new AmazonReviewDTO();
 			Matcher m;
 
+			// Autor
 			m = pAuthor.matcher(bloque);
 			rev.setAuthor(m.find() ? limpiar(m.group(1)) : "Anonymous");
 
+			// Titulo — data-hook="reviewTitle" (camelCase)
 			m = pTitle.matcher(bloque);
 			if (m.find()) {
 				String t = limpiar(m.group(1));
-				if (t.length() > 3)
-					rev.setTitle(t);
+				if (t.length() > 3) rev.setTitle(t);
 			}
 
-			m = pBody.matcher(bloque);
+			// Rating
+			m = pRating.matcher(bloque);
+			if (!m.find()) m = pRatingFb.matcher(bloque);
+			if (m.find()) {
+				try { rev.setRating(Double.parseDouble(m.group(1))); }
+				catch (Exception ignored) {}
+			}
+
+			// Body
+			m = pBodyDouble.matcher(bloque);
+			if (!m.find()) m = pBodySingle.matcher(bloque);
 			if (m.find()) {
 				String b = limpiar(m.group(1));
-				rev.setBody(b.length() > 600 ? b.substring(0, 597) + "..." : b);
+				if (b.length() > 10)
+					rev.setBody(b.length() > 600 ? b.substring(0, 597) + "..." : b);
 			}
 
-			m = pRating.matcher(bloque);
-			if (m.find()) {
-				try {
-					rev.setRating(Double.parseDouble(m.group(1)));
-				} catch (Exception ignored) {
-				}
-			}
-
+			// Fecha
 			m = pDate.matcher(bloque);
-			if (m.find())
-				rev.setDate(limpiar(m.group(1)));
+			if (m.find()) rev.setDate(limpiar(m.group(1)));
 
 			if (rev.getTitle() != null || rev.getBody() != null) {
 				lista.add(rev);
 				count++;
 			}
 		}
+		System.out.println("parsearResenas -> bloques: " + (partes.length - 1)
+				+ ", validas: " + lista.size());
 		return lista;
 	}
 
