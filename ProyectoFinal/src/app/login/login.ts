@@ -96,7 +96,7 @@ export class Login {
       this.isLoading.set(false);
       if (r.success) {
         this.notify.success(r.message);
-        this.router.navigate(['/home']);
+        this.router.navigate(['/compare']);
       } else {
         this.loginError = r.message;
       }

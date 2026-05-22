@@ -93,9 +93,7 @@
         <div class="card-body">
           <span class="card-store am-badge">Amazon</span>
 
-          <h3 class="card-name" (click)="openProduct(p)" title="{{ p.title }}">
-            {{ p.title }}
-          </h3>
+
 
           <div class="card-rating" *ngIf="p.rating">
             <span class="stars">{{ svc.stars(p.rating) }}</span>
@@ -107,9 +105,6 @@
           <div class="card-price">
             <span class="price-amount" [class.neon-cyan]="svc.isCheapest(p)">
               {{ p.price > 0 ? (p.price | currency:'COP':'symbol':'1.0-0') : '—' }}
-            </span>
-            <span class="price-usd" *ngIf="p.price > 0">
-              ≈ ${{ p.price | number:'1.2-2' }} USD
             </span>
           </div>
 

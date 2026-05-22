@@ -2,7 +2,7 @@
   <div class="nb-inner">
 
     <!-- Logo -->
-    <a routerLink="/home" class="nb-logo">
+    <a  class="nb-logo">
       <span class="logo-icon">⚡</span>
       <span class="logo-text">UNI<span>SHOP</span></span>
     </a>
@@ -16,20 +16,8 @@
     <!-- Right actions -->
     <nav class="nb-actions" *ngIf="auth.isLoggedIn()">
 
-      <!-- Categories dropdown -->
-      <div class="nb-dropdown">
-        <button class="nb-link">Categorías ▾</button>
-        <div class="nb-dropdown-menu">
-          <a *ngFor="let cat of products.categories" class="dd-item"
-             (click)="products.setCategory(cat); mobileOpen.set(false)"
-             routerLink="/home">
-            {{ catLabels[cat] || cat }}
-          </a>
-        </div>
-      </div>
 
-      <a routerLink="/home"    class="nb-link">Tienda</a>
-      <a routerLink="/compare" class="nb-link neon-cyan">🔍 Comparar</a>
+
       <a routerLink="/history" class="nb-link">Mis Pedidos</a>
       <a *ngIf="auth.isAdmin()" routerLink="/admin" class="nb-link neon-magenta">Admin</a>
 
