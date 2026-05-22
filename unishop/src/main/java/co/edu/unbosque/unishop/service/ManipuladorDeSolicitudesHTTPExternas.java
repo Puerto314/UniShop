@@ -17,6 +17,7 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 import co.edu.unbosque.unishop.dto.AmazonItemDTO;
 import co.edu.unbosque.unishop.dto.AmazonReviewDTO;
 
@@ -96,6 +97,7 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 				}
 				String q = URLEncoder.encode(query.trim(), StandardCharsets.UTF_8);
 				String url = "https://www.amazon.com/s?k=" + q + "&language=en_US";
+
 
 				HttpResponse<String> r = HTTP_CLIENT.send(buildRequest(url, getRandomUA()),
 						HttpResponse.BodyHandlers.ofString());
@@ -209,7 +211,7 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 				Pattern.DOTALL);
 		Pattern pAuthor = Pattern.compile("class=\"a-profile-name\"[^>]*>([^<]+)<");
 		Pattern pTitle = Pattern.compile("data-hook=\"review-title\"[^>]*>[^<]*<span[^>]*>([^<]{3,200})");
-		Pattern pBody = Pattern.compile("data-hook=\"review-body\"[^>]*>\\s*<span[^>]*>([\\s\\S]{10,2000?})</span>");
+		Pattern pBody = Pattern.compile("data-hook=\"review-body\"[^>]*>\\s*<span[^>]*>([\\s\\S]{10,2000})</span>");
 		Pattern pRating = Pattern.compile("([0-9\\.]+) out of 5 stars");
 		Pattern pDate = Pattern.compile("data-hook=\"review-date\"[^>]*>([^<]{5,80})<");
 
@@ -260,8 +262,8 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 
 	private static String extraerTitulo(String bloque) {
 		Pattern p1 = Pattern.compile(
-				"<a[^>]+class=\"[^\"]*a-link-normal[^\"]*s-underline-text[^\"]*\"[^>]*aria-label=\"([^\"{10,400})\"",
-				Pattern.DOTALL);
+			    "<a[^>]+class=\"[^\"]*a-link-normal[^\"]*s-underline-text[^\"]*\"[^>]*aria-label=\"([^\"]{10,400})\"",
+			    Pattern.DOTALL);
 		Pattern p2 = Pattern.compile("<h2[^>]*>[^<]*<a[^>]*>[^<]*<span[^>]*>([^<]{10,400})</span>", Pattern.DOTALL);
 		Pattern p3 = Pattern.compile(
 				"<span[^>]+class=\"[^\"]*(?:a-size-base-plus|a-size-medium)[^\"]*\"[^>]*>\\s*([^<]{10,400})\\s*</span>",
