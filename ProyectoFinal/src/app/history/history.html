@@ -12,13 +12,7 @@
             <span class="font-mono neon-cyan">#{{ order.id }}</span>
             <span class="oc-date">{{ formatDate(order.date) }}</span>
           </div>
-          <div class="oc-status-wrap">
-            <span class="oc-status"
-                  [style.color]="orderService.statusColor(order.status)"
-                  [style.border-color]="orderService.statusColor(order.status)">
-              {{ orderService.statusLabel(order.status) }}
-            </span>
-          </div>
+
         </div>
         <div class="oc-items">
           <div class="oc-item" *ngFor="let item of order.items">
@@ -63,11 +57,7 @@
       <div class="factura-meta">
         <div class="fm-row"><span>Factura N°:</span><strong class="neon-cyan">{{ facturaOrder.id }}</strong></div>
         <div class="fm-row"><span>Fecha:</span><strong>{{ formatDate(facturaOrder.date) }}</strong></div>
-        <div class="fm-row"><span>Estado:</span>
-          <strong [style.color]="orderService.statusColor(facturaOrder.status)">
-            {{ orderService.statusLabel(facturaOrder.status) }}
-          </strong>
-        </div>
+
       </div>
     </div>
 
@@ -108,7 +98,6 @@
     <div class="factura-footer">
       <p>🛡️ Garantía de 12 meses en todos los productos · UniShop © {{ currentYear }}</p>
       <p>Gracias por tu compra. Para soporte: soporte@unishop.co</p>
-      <button class="btn btn-cyan btn-sm" onclick="window.print()">🖨️ Imprimir Factura</button>
     </div>
   </div>
 </div>
