@@ -47,19 +47,13 @@
         <h3 class="admin-subtitle">Últimos Pedidos</h3>
         <div class="admin-table-wrap">
           <table class="admin-table">
-            <thead><tr><th>ID</th><th>Fecha</th><th>Total</th><th>Estado</th></tr></thead>
+            <thead><tr><th>ID</th><th>Fecha</th><th>Total</th></tr></thead>
             <tbody>
               <tr *ngFor="let o of orders.orders()">
                 <td class="mono neon-cyan">{{ o.id }}</td>
                 <td>{{ formatDate(o.date) }}</td>
                 <td class="mono">{{ formatPrice(o.total) }}</td>
-                <td>
-                  <span class="status-badge"
-                        [style.color]="orders.statusColor(o.status)"
-                        [style.border-color]="orders.statusColor(o.status)">
-                    {{ orders.statusLabel(o.status) }}
-                  </span>
-                </td>
+
               </tr>
             </tbody>
           </table>
@@ -97,20 +91,14 @@
         <h2 class="admin-title">GESTIÓN DE PEDIDOS</h2>
         <div class="admin-table-wrap">
           <table class="admin-table">
-            <thead><tr><th>ID</th><th>Fecha</th><th>Items</th><th>Total</th><th>Estado</th></tr></thead>
+            <thead><tr><th>ID</th><th>Fecha</th><th>Items</th><th>Total</th></tr></thead>
             <tbody>
               <tr *ngFor="let o of orders.orders()">
                 <td class="mono neon-cyan">{{ o.id }}</td>
                 <td>{{ formatDate(o.date) }}</td>
                 <td class="mono">{{ o.items.length }} item(s)</td>
                 <td class="mono neon-yellow">{{ formatPrice(o.total) }}</td>
-                <td>
-                  <span class="status-badge"
-                        [style.color]="orders.statusColor(o.status)"
-                        [style.border-color]="orders.statusColor(o.status)">
-                    {{ orders.statusLabel(o.status) }}
-                  </span>
-                </td>
+
               </tr>
             </tbody>
           </table>
