@@ -28,25 +28,8 @@
       </button>
 
       <!-- User menu -->
-      <div class="nb-dropdown">
-        <button class="nb-user-btn">
-          <span class="user-avatar">{{ userInitial }}</span>
-          <span class="user-name">{{ userFirstName }}</span>
-        </button>
-        <div class="nb-dropdown-menu align-right">
-          <div class="dd-header">
-            <span class="dd-name">{{ auth.user()?.name }}</span>
-            <span class="badge badge-{{ auth.isAdmin() ? 'magenta' : 'cyan' }}">
-              {{ auth.isAdmin() ? 'Admin' : 'Cliente' }}
-            </span>
-          </div>
-          <div class="dd-divider"></div>
-          <a routerLink="/history" class="dd-item">📦 Mis Pedidos</a>
-          <a routerLink="/compare" class="dd-item">🔍 Comparar Precios</a>
-          <a *ngIf="auth.isAdmin()" routerLink="/admin" class="dd-item">⚙️ Panel Admin</a>
-          <div class="dd-divider"></div>
+      <div class="align-right">
           <button class="dd-item dd-logout" (click)="logout()">🚪 Cerrar Sesión</button>
-        </div>
       </div>
     </nav>
 
