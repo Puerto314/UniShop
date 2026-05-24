@@ -21,12 +21,11 @@ export interface CartItem {
 }
 
 export interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: 'admin' | 'client';
+  id?: number;
+  nombreUsuario: string;
+  rol: string;
   avatar?: string;
-  joinDate: string;
+  joinDate?: string;
 }
 
 export interface Order {
@@ -65,4 +64,18 @@ export interface AmazonReview {
   body?: string;
   rating?: number;
   date?: string;
+}
+
+export interface AdminUser {
+  id: number;
+  nombreUsuario: string;
+  contraseniaUsuario: string;
+  codigoAdmin: string;
+}
+
+export interface ClienteUser {
+  id: number;
+  nombreUsuario: string;
+  contraseniaUsuario: string;
+  correoElectronico: string;
 }

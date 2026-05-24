@@ -46,6 +46,6 @@ export class Navbar {
 
   toggleMobile() { this.mobileOpen.update(v => !v); }
 
-  get userInitial(): string  { return this.auth.user()?.name?.charAt(0) ?? ''; }
-  get userFirstName(): string { return this.auth.user()?.name?.split(' ')[0] ?? ''; }
+  get userInitial(): string  { return this.auth.user()?.nombreUsuario?.charAt(0)?.toUpperCase() ?? '?'; }
+  get userFirstName(): string { return this.auth.user()?.nombreUsuario ?? ''; }
 }
