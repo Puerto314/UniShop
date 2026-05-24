@@ -16,7 +16,6 @@ import co.edu.unbosque.unishop.service.ProductoService;
 
 @RestController
 @RequestMapping("/producto")
-@CrossOrigin(origins = "*")
 public class ProductoController {
 
     @Autowired

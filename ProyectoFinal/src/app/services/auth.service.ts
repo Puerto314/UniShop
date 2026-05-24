@@ -4,7 +4,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { User } from '../models';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'https://gpcueb.com/unishop';
 const TOKEN_KEY = 'unishop_token';
 const USER_KEY  = 'unishop_user';
 

@@ -12,7 +12,6 @@ import co.edu.unbosque.unishop.service.AdminService;
 
 @RestController
 @RequestMapping("/admin")
-@CrossOrigin(origins = { "http://localhost:4200", "http://localhost:8080" })
 public class AdminController {
 
     @Autowired

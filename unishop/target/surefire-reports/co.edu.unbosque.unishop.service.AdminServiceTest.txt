@@ -1,0 +1,23 @@
+-------------------------------------------------------------------------------
+Test set: co.edu.unbosque.unishop.service.AdminServiceTest
+-------------------------------------------------------------------------------
+Tests run: 13, Failures: 1, Errors: 2, Skipped: 0, Time elapsed: 0.396 s <<< FAILURE! -- in co.edu.unbosque.unishop.service.AdminServiceTest
+co.edu.unbosque.unishop.service.AdminServiceTest.create_cuandoNombreNoExiste_retorna1 -- Time elapsed: 0.012 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Debe retornar 1 cuando el admin se crea exitosamente ==> expected: <1> but was: <0>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:158)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:139)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:201)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:152)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:590)
+	at co.edu.unbosque.unishop.service.AdminServiceTest.create_cuandoNombreNoExiste_retorna1(AdminServiceTest.java:54)
+
+co.edu.unbosque.unishop.service.AdminServiceTest.updateById_cuandoExisteYNombreLibre_retorna1 -- Time elapsed: 0.006 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "org.springframework.security.crypto.password.PasswordEncoder.encode(java.lang.CharSequence)" because "<local5>.passwordEncoder" is null
+	at co.edu.unbosque.unishop.service.AdminService.updateById(AdminService.java:97)
+	at co.edu.unbosque.unishop.service.AdminServiceTest.updateById_cuandoExisteYNombreLibre_retorna1(AdminServiceTest.java:121)
+
+co.edu.unbosque.unishop.service.AdminServiceTest.updateById_cuandoNombreEsElMismoDelAdmin_retorna1 -- Time elapsed: 0.009 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "org.springframework.security.crypto.password.PasswordEncoder.encode(java.lang.CharSequence)" because "<local5>.passwordEncoder" is null
+	at co.edu.unbosque.unishop.service.AdminService.updateById(AdminService.java:97)
+	at co.edu.unbosque.unishop.service.AdminServiceTest.updateById_cuandoNombreEsElMismoDelAdmin_retorna1(AdminServiceTest.java:160)
+
