@@ -152,7 +152,7 @@ export class Login {
       this.registerError = 'Las contraseñas no coinciden';
       return;
     }
- 
+
     if (!this.dominioPermitido(this.regEmail)) {
       this.registerError = 'Solo se permiten correos @gmail.com, @hotmail.com o @unbosque.edu.co';
       return;
