@@ -141,10 +141,6 @@
           </div>
         </div>
 
-        <label class="check-label">
-          <input type="checkbox" [(ngModel)]="acceptTerms" name="terms"/>
-          Acepto los <a href="#">términos y condiciones</a>
-        </label>
 
         <div class="error-msg" *ngIf="registerError" [@shake]>⚠️ {{ registerError }}</div>
 
