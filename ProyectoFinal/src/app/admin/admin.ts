@@ -17,17 +17,18 @@ import { AdminUser, ClienteUser } from '../models';
   styleUrl: './admin.css',
 })
 export class Admin implements OnInit {
-  activeTab = signal<'dashboard' | 'products' | 'orders' | 'users'>('dashboard');
+  activeTab = signal<'dashboard' | 'orders' | 'users'>('dashboard');
 
   // ── Datos usuarios ────────────────────────────────────────────────────────
   admins: AdminUser[] = [];
-  clientes: ClienteUser[] = [];
+  clientes: ClienteUser[] = []
   userSubTab: 'admins' | 'clientes' = 'admins';
 
   // ── Formulario nuevo admin ─────────────────────────────────────────────────
   newAdminUsername = '';
   newAdminPassword = '';
   loadingUsers = false;
+  loadingOrders = false;
 
   constructor(
     public products: ProductService,
@@ -38,7 +39,23 @@ export class Admin implements OnInit {
     private userMgmt: UserManagementService,
   ) {}
 
-  ngOnInit() { /* lazy: se carga al abrir la pestaña */ }
+  ngOnInit() {}
+
+  // ── Pestaña Historial Global ──────────────────────────────────────────────
+
+  openOrdersTab() {
+    this.activeTab.set('orders');
+    this.loadingOrders = true;
+    this.orders.loadTodasLasOrdenes().subscribe({
+      next: () => (this.loadingOrders = false),
+      error: () => {
+        this.notify.error('Error cargando el historial de pedidos');
+        this.loadingOrders = false;
+      },
+    });
+  }
+
+  // ── Pestaña Usuarios ──────────────────────────────────────────────────────
 
   openUsersTab() {
     this.activeTab.set('users');
@@ -49,20 +66,17 @@ export class Admin implements OnInit {
     this.loadingUsers = true;
     this.userMgmt.getAdmins().subscribe({
       next: data => {
-        // El backend puede devolver null si la respuesta es 204 vacío
         this.admins = data ?? [];
         this.loadingUsers = false;
       },
       error: () => {
         this.notify.error('Error cargando admins');
         this.loadingUsers = false;
-      }
+      },
     });
     this.userMgmt.getClientes().subscribe({
-      next: data => {
-        this.clientes = data ?? [];
-      },
-      error: () => this.notify.error('Error cargando clientes')
+      next: data => (this.clientes = data ?? []),
+      error: () => this.notify.error('Error cargando clientes'),
     });
   }
 
@@ -78,33 +92,28 @@ export class Admin implements OnInit {
         this.newAdminPassword = '';
         this.loadUsers();
       },
-      error: err => this.notify.error(err?.error || 'Error al crear admin')
+      error: err => this.notify.error(err?.error || 'Error al crear admin'),
     });
   }
 
   deleteAdmin(id: number) {
     if (!confirm('¿Eliminar este admin?')) return;
     this.userMgmt.deleteAdmin(id).subscribe({
-      next: () => {
-        this.notify.success('Admin eliminado');
-        this.loadUsers();
-      },
-      error: () => this.notify.error('Error al eliminar admin')
+      next: () => { this.notify.success('Admin eliminado'); this.loadUsers(); },
+      error: () => this.notify.error('Error al eliminar admin'),
     });
   }
 
   deleteCliente(id: number) {
     if (!confirm('¿Eliminar este usuario?')) return;
     this.userMgmt.deleteCliente(id).subscribe({
-      next: () => {
-        this.notify.success('Usuario eliminado');
-        this.loadUsers();
-      },
-      error: () => this.notify.error('Error al eliminar usuario')
+      next: () => { this.notify.success('Usuario eliminado'); this.loadUsers(); },
+      error: () => this.notify.error('Error al eliminar usuario'),
     });
   }
 
-  // ── Helpers existentes ────────────────────────────────────────────────────
+  // ── Helpers ───────────────────────────────────────────────────────────────
+
   get totalRevenue() {
     return this.orders.orders().reduce((s, o) => s + o.total, 0);
   }
@@ -118,19 +127,22 @@ export class Admin implements OnInit {
   }
 
   formatPrice(p: number) {
-    return '$' + p.toLocaleString('es-CO');
+    return '$' + (p / 4000).toLocaleString('es-CO', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
   }
 
   formatDate(d: string) {
-    // Parsear la fecha como fecha local para evitar desfase de zona horaria
     const [year, month, day] = d.split('T')[0].split('-').map(Number);
     return new Date(year, month - 1, day).toLocaleDateString('es-CO', {
-      month: 'short', day: 'numeric', year: 'numeric'
+      month: 'short', day: 'numeric', year: 'numeric',
     });
   }
 
   logout() {
     this.auth.logout();
+    this.orders.clearOrders();
     this.notify.info('Sesión cerrada.');
     this.router.navigate(['/login']);
   }

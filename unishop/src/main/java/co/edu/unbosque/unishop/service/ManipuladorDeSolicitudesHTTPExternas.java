@@ -17,7 +17,6 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-
 import co.edu.unbosque.unishop.dto.AmazonItemDTO;
 import co.edu.unbosque.unishop.dto.AmazonReviewDTO;
 
@@ -121,10 +120,9 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 
 	public static List<AmazonReviewDTO> obtenerResenasAmazon(String asin) {
 		List<String> urls = List.of(
-			"https://www.amazon.com/product-reviews/" + asin
-				+ "?sortBy=recent&reviewerType=all_reviews&language=en_US",
-			"https://www.amazon.com/dp/" + asin + "#customerReviews"
-		);
+				"https://www.amazon.com/product-reviews/" + asin
+						+ "?sortBy=recent&reviewerType=all_reviews&language=en_US",
+				"https://www.amazon.com/dp/" + asin + "#customerReviews");
 
 		for (String url : urls) {
 			for (int intento = 0; intento < 3; intento++) {
@@ -134,8 +132,8 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 
 					HttpResponse<String> r = HTTP_CLIENT.send(buildRequest(url, getRandomUA()),
 							HttpResponse.BodyHandlers.ofString());
-					System.out.println("Amazon /reviews [" + asin + "] intento " + (intento + 1)
-							+ " status=" + r.statusCode());
+					System.out.println(
+							"Amazon /reviews [" + asin + "] intento " + (intento + 1) + " status=" + r.statusCode());
 
 					String responseBody = r.body();
 
@@ -239,23 +237,25 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 		//
 		// Amazon usa data-hook="reviewTitle" (camelCase, sin guion) dentro de <h5>
 		// NO usa data-hook="review-title" como se esperaba antes.
-		// El rating viene en data-hook="review-star-rating" en el <i>, texto en span.a-icon-alt
+		// El rating viene en data-hook="review-star-rating" en el <i>, texto en
+		// span.a-icon-alt
 		// El body sigue usando data-hook="review-body" con estructura div>span>span
 		//
-		Pattern pAuthor  = Pattern.compile("class=\"a-profile-name\"[^>]*>([^<]+)<");
+		Pattern pAuthor = Pattern.compile("class=\"a-profile-name\"[^>]*>([^<]+)<");
 
 		// Titulo: data-hook="reviewTitle" en <h5> — el texto es hijo directo del tag
-		Pattern pTitle   = Pattern.compile("data-hook=[\"']reviewTitle[\"'][^>]*>([^<]{3,400})<",
-				Pattern.DOTALL);
+		Pattern pTitle = Pattern.compile("data-hook=[\"']reviewTitle[\"'][^>]*>([^<]{3,400})<", Pattern.DOTALL);
 
-		// Rating: data-hook="review-star-rating" en <i>, texto "N out of 5 stars" en span hijo
-		Pattern pRating  = Pattern.compile(
+		// Rating: data-hook="review-star-rating" en <i>, texto "N out of 5 stars" en
+		// span hijo
+		Pattern pRating = Pattern.compile(
 				"data-hook=[\"']review-star-rating[\"'][^>]*>[\\s\\S]*?<span[^>]*>([0-9.]+) out of [0-9.]+ stars",
 				Pattern.DOTALL);
 		// Fallback: cualquier "N out of 5 stars" en el bloque
 		Pattern pRatingFb = Pattern.compile("([0-9.]+) out of [0-9.]+ stars");
 
-		// Body: data-hook="review-body", texto dentro de span>span (o span directo como fallback)
+		// Body: data-hook="review-body", texto dentro de span>span (o span directo como
+		// fallback)
 		Pattern pBodyDouble = Pattern.compile(
 				"data-hook=[\"']review-body[\"'][^>]*>[\\s\\S]*?<span[^>]*>\\s*<span[^>]*>([\\s\\S]+?)</span>\\s*</span>",
 				Pattern.DOTALL);
@@ -263,12 +263,14 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 				"data-hook=[\"']review-body[\"'][^>]*>[\\s\\S]*?<span[^>]*>([\\s\\S]{10,3000}?)</span>",
 				Pattern.DOTALL);
 
-		Pattern pDate    = Pattern.compile("data-hook=[\"']review-date[\"'][^>]*>([^<]{5,100})<");
+		Pattern pDate = Pattern.compile("data-hook=[\"']review-date[\"'][^>]*>([^<]{5,100})<");
 
 		int count = 0;
 		for (String bloque : partes) {
-			if (count >= 10) break;
-			if (!bloque.contains("data-hook=\"review\"") && !bloque.contains("data-hook='review'")) continue;
+			if (count >= 10)
+				break;
+			if (!bloque.contains("data-hook=\"review\"") && !bloque.contains("data-hook='review'"))
+				continue;
 
 			AmazonReviewDTO rev = new AmazonReviewDTO();
 			Matcher m;
@@ -281,20 +283,25 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 			m = pTitle.matcher(bloque);
 			if (m.find()) {
 				String t = limpiar(m.group(1));
-				if (t.length() > 3) rev.setTitle(t);
+				if (t.length() > 3)
+					rev.setTitle(t);
 			}
 
 			// Rating
 			m = pRating.matcher(bloque);
-			if (!m.find()) m = pRatingFb.matcher(bloque);
+			if (!m.find())
+				m = pRatingFb.matcher(bloque);
 			if (m.find()) {
-				try { rev.setRating(Double.parseDouble(m.group(1))); }
-				catch (Exception ignored) {}
+				try {
+					rev.setRating(Double.parseDouble(m.group(1)));
+				} catch (Exception ignored) {
+				}
 			}
 
 			// Body
 			m = pBodyDouble.matcher(bloque);
-			if (!m.find()) m = pBodySingle.matcher(bloque);
+			if (!m.find())
+				m = pBodySingle.matcher(bloque);
 			if (m.find()) {
 				String b = limpiar(m.group(1));
 				if (b.length() > 10)
@@ -303,15 +310,15 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 
 			// Fecha
 			m = pDate.matcher(bloque);
-			if (m.find()) rev.setDate(limpiar(m.group(1)));
+			if (m.find())
+				rev.setDate(limpiar(m.group(1)));
 
 			if (rev.getTitle() != null || rev.getBody() != null) {
 				lista.add(rev);
 				count++;
 			}
 		}
-		System.out.println("parsearResenas -> bloques: " + (partes.length - 1)
-				+ ", validas: " + lista.size());
+		System.out.println("parsearResenas -> bloques: " + (partes.length - 1) + ", validas: " + lista.size());
 		return lista;
 	}
 
@@ -319,8 +326,8 @@ public class ManipuladorDeSolicitudesHTTPExternas {
 
 	private static String extraerTitulo(String bloque) {
 		Pattern p1 = Pattern.compile(
-			    "<a[^>]+class=\"[^\"]*a-link-normal[^\"]*s-underline-text[^\"]*\"[^>]*aria-label=\"([^\"]{10,400})\"",
-			    Pattern.DOTALL);
+				"<a[^>]+class=\"[^\"]*a-link-normal[^\"]*s-underline-text[^\"]*\"[^>]*aria-label=\"([^\"]{10,400})\"",
+				Pattern.DOTALL);
 		Pattern p2 = Pattern.compile("<h2[^>]*>[^<]*<a[^>]*>[^<]*<span[^>]*>([^<]{10,400})</span>", Pattern.DOTALL);
 		Pattern p3 = Pattern.compile(
 				"<span[^>]+class=\"[^\"]*(?:a-size-base-plus|a-size-medium)[^\"]*\"[^>]*>\\s*([^<]{10,400})\\s*</span>",
