@@ -12,73 +12,71 @@ import co.edu.unbosque.unishop.service.ClienteService;
 
 @RestController
 @RequestMapping("/cliente")
-@CrossOrigin(origins = { "http://localhost:4200", "http://localhost:8080", "*" })
+@CrossOrigin(origins = { "http://localhost:4200", "http://localhost:8080" })
 public class ClienteController {
 
-	@Autowired
-	private ClienteService clienteService;
+    @Autowired
+    private ClienteService clienteService;
 
-	@GetMapping("/mostrartodo")
-	public ResponseEntity<List<ClienteDTO>> mostrarTodo() {
-		List<ClienteDTO> lista = clienteService.getAll();
-		if (lista.isEmpty()) {
-			return new ResponseEntity<>(lista, HttpStatus.NO_CONTENT);
-		}
-		return new ResponseEntity<>(lista, HttpStatus.OK);
-	}
+    /**
+     * GET /cliente/mostrartodo
+     * CORRECCIÓN: siempre devuelve 200 OK aunque la lista esté vacía
+     * (antes devolvía 204 No Content con cuerpo nulo, lo que rompía el frontend).
+     */
+    @GetMapping("/mostrartodo")
+    public ResponseEntity<List<ClienteDTO>> mostrarTodo() {
+        List<ClienteDTO> lista = clienteService.getAll();
+        return ResponseEntity.ok(lista);
+    }
 
-	/**
-	 * POST /cliente/crear?nombreUsuario=xxx&contraseniaUsuario=yyy&correoElectronico=zzz
-	 * - Rechaza nombre duplicado (409 CONFLICT)
-	 * - Valida formato de correo (400 BAD REQUEST)
-	 * - Si todo es valido: crea el cliente y envia codigo de verificacion al correo
-	 */
-	@PostMapping("/crear")
-	public ResponseEntity<String> crear(
-			@RequestParam String nombreUsuario,
-			@RequestParam String contraseniaUsuario,
-			@RequestParam String correoElectronico) {
-		int resultado = clienteService.create(nombreUsuario, contraseniaUsuario, correoElectronico);
-		return switch (resultado) {
-			case 1  -> new ResponseEntity<>(
-						"Cliente creado correctamente. Se envio un codigo de verificacion a " + correoElectronico,
-						HttpStatus.CREATED);
-			case -1 -> new ResponseEntity<>(
-						"El nombre de usuario '" + nombreUsuario + "' ya existe",
-						HttpStatus.CONFLICT);
-			case -2 -> new ResponseEntity<>(
-						"El correo electronico '" + correoElectronico + "' no tiene un formato valido",
-						HttpStatus.BAD_REQUEST);
-			default -> new ResponseEntity<>("Error al crear cliente", HttpStatus.BAD_REQUEST);
-		};
-	}
+    /**
+     * POST /cliente/crear?nombreUsuario=xxx&contraseniaUsuario=yyy&correoElectronico=zzz
+     */
+    @PostMapping("/crear")
+    public ResponseEntity<String> crear(
+            @RequestParam String nombreUsuario,
+            @RequestParam String contraseniaUsuario,
+            @RequestParam String correoElectronico) {
+        int resultado = clienteService.create(nombreUsuario, contraseniaUsuario, correoElectronico);
+        return switch (resultado) {
+            case 1  -> new ResponseEntity<>(
+                    "Cliente creado correctamente. Se envió un código de verificación a " + correoElectronico,
+                    HttpStatus.CREATED);
+            case -1 -> new ResponseEntity<>(
+                    "El nombre de usuario '" + nombreUsuario + "' ya existe",
+                    HttpStatus.CONFLICT);
+            case -2 -> new ResponseEntity<>(
+                    "El correo electrónico '" + correoElectronico + "' no tiene un formato válido",
+                    HttpStatus.BAD_REQUEST);
+            default -> new ResponseEntity<>("Error al crear cliente", HttpStatus.BAD_REQUEST);
+        };
+    }
 
-	@PutMapping("/actualizar/{id}")
-	public ResponseEntity<String> actualizar(
-			@PathVariable Long id,
-			@RequestParam String nombreUsuario,
-			@RequestParam String contraseniaUsuario,
-			@RequestParam String correoElectronico) {
-		int resultado = clienteService.updateById(id, nombreUsuario, contraseniaUsuario, correoElectronico);
-		return switch (resultado) {
-			case 1  -> new ResponseEntity<>("Cliente actualizado", HttpStatus.OK);
-			case -1 -> new ResponseEntity<>(
-						"El nombre de usuario '" + nombreUsuario + "' ya existe",
-						HttpStatus.CONFLICT);
-			case -2 -> new ResponseEntity<>(
-						"El correo electronico '" + correoElectronico + "' no tiene un formato valido",
-						HttpStatus.BAD_REQUEST);
-			default -> new ResponseEntity<>("Cliente no encontrado", HttpStatus.NOT_FOUND);
-		};
-	}
+    @PutMapping("/actualizar/{id}")
+    public ResponseEntity<String> actualizar(
+            @PathVariable Long id,
+            @RequestParam String nombreUsuario,
+            @RequestParam String contraseniaUsuario,
+            @RequestParam String correoElectronico) {
+        int resultado = clienteService.updateById(id, nombreUsuario, contraseniaUsuario, correoElectronico);
+        return switch (resultado) {
+            case 1  -> new ResponseEntity<>("Cliente actualizado", HttpStatus.OK);
+            case -1 -> new ResponseEntity<>(
+                    "El nombre de usuario '" + nombreUsuario + "' ya existe",
+                    HttpStatus.CONFLICT);
+            case -2 -> new ResponseEntity<>(
+                    "El correo electrónico '" + correoElectronico + "' no tiene un formato válido",
+                    HttpStatus.BAD_REQUEST);
+            default -> new ResponseEntity<>("Cliente no encontrado", HttpStatus.NOT_FOUND);
+        };
+    }
 
-	@DeleteMapping("/eliminar/{id}")
-	public ResponseEntity<String> eliminar(@PathVariable Long id) {
-		int resultado = clienteService.deleteById(id);
-		if (resultado == 1) {
-			return new ResponseEntity<>("Cliente eliminado", HttpStatus.OK);
-		}
-		return new ResponseEntity<>("Cliente no encontrado", HttpStatus.NOT_FOUND);
-	}
-
+    @DeleteMapping("/eliminar/{id}")
+    public ResponseEntity<String> eliminar(@PathVariable Long id) {
+        int resultado = clienteService.deleteById(id);
+        if (resultado == 1) {
+            return new ResponseEntity<>("Cliente eliminado", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Cliente no encontrado", HttpStatus.NOT_FOUND);
+    }
 }

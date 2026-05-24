@@ -50,11 +50,20 @@ export class Compare {
   cerrarResenas(): void { this.svc.cerrarResenas(); }
 
   addToCart(product: AmazonProduct): void {
-    // Convertir AmazonProduct a ProductItem para el carrito
+    // El precio de Amazon llega en USD desde el backend.
+    // Se conserva el precio USD original y se convierte a COP para mostrar en el carrito.
+    if (!product.price || product.price <= 0) {
+      this.notify.info('Precio no disponible — visita Amazon para ver el precio actual.');
+      return;
+    }
+
+    const priceCOP = Math.round(product.price * 4000); // USD → COP aproximado
+
     const item: ProductItem = {
-      id: product.asin.split('').reduce((a, c) => a + c.charCodeAt(0), 0), // ID numérico desde ASIN
+      id: product.asin.split('').reduce((a, c) => a + c.charCodeAt(0), 0),
       name: product.title.length > 80 ? product.title.substring(0, 80) + '...' : product.title,
-      price: product.price > 0 ? Math.round(product.price * 4000) : 0, // USD a COP aproximado
+      price: priceCOP,          // precio en COP para mostrar en carrito y factura
+      originalPrice: product.price, // precio original en USD (referencia)
       image: product.imageUrl || '',
       category: 'amazon',
       rating: product.rating ?? 4.5,
@@ -63,12 +72,20 @@ export class Compare {
       amazonUrl: product.url,
       asin: product.asin,
     };
-    if (item.price === 0) {
-      this.notify.info('Precio no disponible — visita Amazon para ver el precio actual.');
-      return;
-    }
+
     this.cart.addToCart(item);
     this.cart.openCart();
     this.notify.success(`${item.name.substring(0, 40)}... agregado al carrito`);
+  }
+
+  /** Muestra el precio en USD con formato legible */
+  formatUSD(price: number): string {
+    return this.svc.formatUSD(price);
+  }
+
+  /** Muestra el precio COP equivalente */
+  formatCOP(priceUSD: number): string {
+    if (!priceUSD || priceUSD <= 0) return 'Ver precio';
+    return '$' + Math.round(priceUSD * 4000).toLocaleString('es-CO');
   }
 }

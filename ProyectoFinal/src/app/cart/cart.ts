@@ -50,5 +50,21 @@ export class Cart {
     }, 1800);
   }
 
-  formatPrice(p: number) { return '$' + p.toLocaleString('es-CO'); }
+  /** Formatea un precio en COP */
+  formatPrice(p: number) {
+    if (!p || p <= 0) return 'Ver precio';
+
+    const converted = p / 4000;
+
+    return '$' + converted.toLocaleString('es-CO', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  /** Etiqueta del precio: si es producto Amazon, muestra COP con nota */
+  priceLabel(price: number, category?: string): string {
+    if (!price || price <= 0) return 'Ver precio en Amazon';
+    return this.formatPrice(price);
+  }
 }

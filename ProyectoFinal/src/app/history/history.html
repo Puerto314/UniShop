@@ -12,7 +12,6 @@
             <span class="font-mono neon-cyan">#{{ order.id }}</span>
             <span class="oc-date">{{ formatDate(order.date) }}</span>
           </div>
-
         </div>
         <div class="oc-items">
           <div class="oc-item" *ngFor="let item of order.items">
@@ -57,7 +56,6 @@
       <div class="factura-meta">
         <div class="fm-row"><span>Factura N°:</span><strong class="neon-cyan">{{ facturaOrder.id }}</strong></div>
         <div class="fm-row"><span>Fecha:</span><strong>{{ formatDate(facturaOrder.date) }}</strong></div>
-
       </div>
     </div>
 
@@ -66,7 +64,7 @@
     <h3 class="factura-section-title">📦 Detalle de Productos</h3>
     <div class="factura-table">
       <div class="ft-head">
-        <span>Producto</span><span>Cat.</span><span>Rating</span><span>Cant.</span><span>P.Unit</span><span>Total</span>
+        <span>Producto</span><span>Cat.</span><span>Rating</span><span>Cant.</span><span>P.Unit (COP)</span><span>Total (COP)</span>
       </div>
       <div class="ft-row" *ngFor="let item of facturaOrder.items">
         <span class="ft-name">{{ item.product.name }}</span>

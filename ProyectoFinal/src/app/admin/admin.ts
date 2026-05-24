@@ -1,13 +1,13 @@
-import {Component, signal, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {Router} from '@angular/router';
-import {ProductService} from '../services/product.service';
-import {OrderService} from '../services/order.service';
-import {AuthService} from '../services/auth.service';
-import {NotificationService} from '../services/notification.service';
-import {UserManagementService} from '../services/user-management.service';
-import {AdminUser, ClienteUser} from '../models';
+import { Component, signal, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { ProductService } from '../services/product.service';
+import { OrderService } from '../services/order.service';
+import { AuthService } from '../services/auth.service';
+import { NotificationService } from '../services/notification.service';
+import { UserManagementService } from '../services/user-management.service';
+import { AdminUser, ClienteUser } from '../models';
 
 @Component({
   selector: 'app-admin',
@@ -36,11 +36,9 @@ export class Admin implements OnInit {
     private notify: NotificationService,
     private router: Router,
     private userMgmt: UserManagementService,
-  ) {
-  }
+  ) {}
 
-  ngOnInit() { /* lazy: se carga al abrir la pestaña */
-  }
+  ngOnInit() { /* lazy: se carga al abrir la pestaña */ }
 
   openUsersTab() {
     this.activeTab.set('users');
@@ -51,7 +49,8 @@ export class Admin implements OnInit {
     this.loadingUsers = true;
     this.userMgmt.getAdmins().subscribe({
       next: data => {
-        this.admins = data;
+        // El backend puede devolver null si la respuesta es 204 vacío
+        this.admins = data ?? [];
         this.loadingUsers = false;
       },
       error: () => {
@@ -61,7 +60,7 @@ export class Admin implements OnInit {
     });
     this.userMgmt.getClientes().subscribe({
       next: data => {
-        this.clientes = data;
+        this.clientes = data ?? [];
       },
       error: () => this.notify.error('Error cargando clientes')
     });
@@ -123,7 +122,11 @@ export class Admin implements OnInit {
   }
 
   formatDate(d: string) {
-    return new Date(d).toLocaleDateString('es-CO', {month: 'short', day: 'numeric'});
+    // Parsear la fecha como fecha local para evitar desfase de zona horaria
+    const [year, month, day] = d.split('T')[0].split('-').map(Number);
+    return new Date(year, month - 1, day).toLocaleDateString('es-CO', {
+      month: 'short', day: 'numeric', year: 'numeric'
+    });
   }
 
   logout() {
