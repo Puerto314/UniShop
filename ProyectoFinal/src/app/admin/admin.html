@@ -5,11 +5,12 @@
     <aside class="admin-sidebar">
       <div class="as-logo">⚙️ <span>ADMIN</span></div>
       <nav class="as-nav">
-        <button class="as-link" [class.active]="activeTab()==='dashboard'" (click)="activeTab.set('dashboard')">📊
-          Dashboard
+        <button class="as-link" [class.active]="activeTab()==='dashboard'" (click)="activeTab.set('dashboard')">
+          📊 Dashboard
         </button>
-
-
+        <button class="as-link" [class.active]="activeTab()==='orders'" (click)="openOrdersTab()">
+          🧾 Historial de Pedidos
+        </button>
         <button class="as-link" [class.active]="activeTab()==='users'" (click)="openUsersTab()">
           👥 Gestión de Usuarios
         </button>
@@ -36,67 +37,86 @@
             <div class="kpi-val neon-magenta">{{ totalOrders }}</div>
             <div class="kpi-label">Pedidos</div>
           </div>
-
         </div>
 
-        <h3 class="admin-subtitle">Últimos Pedidos</h3>
+        <h3 class="admin-subtitle">Resumen rápido</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem;">
+          Ve a <strong>Historial de Pedidos</strong> para ver todos los pedidos de todos los usuarios.
+        </p>
+      </div>
+
+      <!-- HISTORIAL GLOBAL DE PEDIDOS (solo admin) -->
+      <div *ngIf="activeTab()==='orders'">
+        <h2 class="admin-title">HISTORIAL GLOBAL DE PEDIDOS</h2>
+
+
         <div class="admin-table-wrap">
           <table class="admin-table">
             <thead>
-            <tr>
-              <th>ID</th>
-              <th>Fecha</th>
-              <th>Total</th>
-            </tr>
+              <tr>
+                <th>ID Orden</th>
+                <th>Cliente</th>
+                <th>Fecha</th>
+                <th>Total</th>
+                <th>Productos</th>
+              </tr>
             </thead>
             <tbody>
-            <tr *ngFor="let o of orders.orders()">
-              <td class="mono neon-cyan">{{ o.id }}</td>
-              <td>{{ formatDate(o.date) }}</td>
-              <td class="mono">{{ formatPrice(o.total) }}</td>
-            </tr>
+              <tr *ngFor="let o of orders.orders()">
+                <td class="mono neon-cyan">{{ o.id }}</td>
+                <td>{{ o.clienteNombre ?? '—' }}</td>
+                <td>{{ formatDate(o.date) }}</td>
+                <td class="mono">{{ formatPrice(o.total) }}</td>
+                <td class="mono" style="font-size:0.8rem">
+                  {{ o.items.length }} producto(s)
+                </td>
+              </tr>
+              <tr *ngIf="orders.orders().length === 0">
+                <td colspan="6" style="text-align:center; color: var(--text-muted)">
+                  No hay pedidos registrados
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
 
-      <!-- ORDERS -->
-      <!-- USERS -->
+      <!-- GESTIÓN DE USUARIOS -->
       <div *ngIf="activeTab()==='users'">
         <h2 class="admin-title">GESTIÓN DE USUARIOS</h2>
 
         <!-- Sub-tabs -->
         <div class="subtab-bar">
-          <button class="as-link" [class.active]="userSubTab==='admins'" (click)="userSubTab='admins'">🛡️ Admins
+          <button class="as-link" [class.active]="userSubTab==='admins'" (click)="userSubTab='admins'">
+            🛡️ Admins
           </button>
-          <button class="as-link" [class.active]="userSubTab==='clientes'" (click)="userSubTab='clientes'">👤 Clientes
+          <button class="as-link" [class.active]="userSubTab==='clientes'" (click)="userSubTab='clientes'">
+            👤 Clientes
           </button>
         </div>
 
-        <!-- Crear Admin -->
+        <!-- Ver Admins -->
         <div *ngIf="userSubTab==='admins'">
-
           <h3 class="admin-subtitle">Admins registrados</h3>
           <div *ngIf="loadingUsers" class="loading-msg">Cargando...</div>
           <div class="admin-table-wrap" *ngIf="!loadingUsers">
             <table class="admin-table">
               <thead>
-              <tr>
-                <th>ID</th>
-                <th>Usuario</th>
-                <th>Código</th>
-              </tr>
+                <tr>
+                  <th>ID</th>
+                  <th>Usuario</th>
+                  <th>Código</th>
+                </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let a of admins">
-                <td class="mono neon-cyan">{{ a.id }}</td>
-                <td>{{ a.nombreUsuario }}</td>
-                <td class="mono">{{ a.codigoAdmin }}</td>
-
-              </tr>
-              <tr *ngIf="admins.length === 0">
-                <td colspan="4" style="text-align:center">Sin admins</td>
-              </tr>
+                <tr *ngFor="let a of admins">
+                  <td class="mono neon-cyan">{{ a.id }}</td>
+                  <td>{{ a.nombreUsuario }}</td>
+                  <td class="mono">{{ a.codigoAdmin }}</td>
+                </tr>
+                <tr *ngIf="admins.length === 0">
+                  <td colspan="3" style="text-align:center">Sin admins</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -108,25 +128,25 @@
           <div class="admin-table-wrap">
             <table class="admin-table">
               <thead>
-              <tr>
-                <th>ID</th>
-                <th>Usuario</th>
-                <th>Correo</th>
-                <th>Acción</th>
-              </tr>
+                <tr>
+                  <th>ID</th>
+                  <th>Usuario</th>
+                  <th>Correo</th>
+                  <th>Acción</th>
+                </tr>
               </thead>
               <tbody>
-              <tr *ngFor="let c of clientes">
-                <td class="mono neon-cyan">{{ c.id }}</td>
-                <td>{{ c.nombreUsuario }}</td>
-                <td>{{ c.correoElectronico }}</td>
-                <td>
-                  <button class="btn btn-danger btn-sm" (click)="deleteCliente(c.id)">🗑️ Eliminar</button>
-                </td>
-              </tr>
-              <tr *ngIf="clientes.length === 0">
-                <td colspan="4" style="text-align:center">Sin usuarios</td>
-              </tr>
+                <tr *ngFor="let c of clientes">
+                  <td class="mono neon-cyan">{{ c.id }}</td>
+                  <td>{{ c.nombreUsuario }}</td>
+                  <td>{{ c.correoElectronico }}</td>
+                  <td>
+                    <button class="btn btn-danger btn-sm" (click)="deleteCliente(c.id)">🗑️ Eliminar</button>
+                  </td>
+                </tr>
+                <tr *ngIf="clientes.length === 0">
+                  <td colspan="4" style="text-align:center">Sin usuarios</td>
+                </tr>
               </tbody>
             </table>
           </div>

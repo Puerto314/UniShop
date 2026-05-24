@@ -34,6 +34,8 @@ export interface Order {
   items: CartItem[];
   total: number;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  /** Solo presente en la vista de admin (/ordenes/todas) */
+  clienteNombre?: string;
 }
 
 export interface ToastMessage {
