@@ -5,10 +5,14 @@
     <aside class="admin-sidebar">
       <div class="as-logo">⚙️ <span>ADMIN</span></div>
       <nav class="as-nav">
-        <button class="as-link" [class.active]="activeTab()==='dashboard'" (click)="activeTab.set('dashboard')">📊 Dashboard</button>
-        <button class="as-link" [class.active]="activeTab()==='products'"  (click)="activeTab.set('products')">📦 Productos</button>
-        <button class="as-link" [class.active]="activeTab()==='orders'"    (click)="activeTab.set('orders')">🧾 Pedidos</button>
-        <button class="as-link" [class.active]="activeTab()==='users'"     (click)="activeTab.set('users')">👥 Usuarios</button>
+        <button class="as-link" [class.active]="activeTab()==='dashboard'" (click)="activeTab.set('dashboard')">📊
+          Dashboard
+        </button>
+
+
+        <button class="as-link" [class.active]="activeTab()==='users'" (click)="openUsersTab()">
+          👥 Gestión de Usuarios
+        </button>
       </nav>
       <div class="as-logout">
         <button class="btn btn-ghost btn-sm" (click)="logout()">🚪 Cerrar Sesión</button>
@@ -32,149 +36,100 @@
             <div class="kpi-val neon-magenta">{{ totalOrders }}</div>
             <div class="kpi-label">Pedidos</div>
           </div>
-          <div class="kpi-card kpi-yellow">
-            <div class="kpi-icon">📦</div>
-            <div class="kpi-val neon-yellow">{{ totalProducts }}</div>
-            <div class="kpi-label">Productos</div>
-          </div>
-          <div class="kpi-card kpi-green">
-            <div class="kpi-icon">👥</div>
-            <div class="kpi-val neon-green">{{ totalUsers }}</div>
-            <div class="kpi-label">Usuarios</div>
-          </div>
+
         </div>
 
         <h3 class="admin-subtitle">Últimos Pedidos</h3>
         <div class="admin-table-wrap">
           <table class="admin-table">
-            <thead><tr><th>ID</th><th>Fecha</th><th>Total</th></tr></thead>
+            <thead>
+            <tr>
+              <th>ID</th>
+              <th>Fecha</th>
+              <th>Total</th>
+            </tr>
+            </thead>
             <tbody>
-              <tr *ngFor="let o of orders.orders()">
-                <td class="mono neon-cyan">{{ o.id }}</td>
-                <td>{{ formatDate(o.date) }}</td>
-                <td class="mono">{{ formatPrice(o.total) }}</td>
-
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- PRODUCTS -->
-      <div *ngIf="activeTab()==='products'">
-        <div class="admin-toolbar">
-          <h2 class="admin-title">PRODUCTOS</h2>
-        </div>
-        <div class="admin-table-wrap">
-          <table class="admin-table">
-            <thead><tr><th>ID</th><th>Nombre</th><th>Categoría</th><th>Precio</th><th>Stock</th><th>Rating</th></tr></thead>
-            <tbody>
-              <tr *ngFor="let p of products.PRODUCTS">
-                <td class="mono">{{ p.id }}</td>
-                <td>
-                  <span class="p-name">{{ p.name }}</span>
-                  <span class="badge badge-magenta ml-4" *ngIf="p.isHot">HOT</span>
-                  <span class="badge badge-cyan ml-4"    *ngIf="p.isNew">NEW</span>
-                </td>
-                <td class="mono">{{ p.category }}</td>
-                <td class="mono neon-cyan">{{ formatPrice(p.price) }}</td>
-                <td><span [class.neon-yellow]="p.stock<=5" [class.neon-red]="p.stock===0">{{ p.stock }}</span></td>
-                <td class="neon-yellow mono">{{ p.rating }}★</td>
-              </tr>
+            <tr *ngFor="let o of orders.orders()">
+              <td class="mono neon-cyan">{{ o.id }}</td>
+              <td>{{ formatDate(o.date) }}</td>
+              <td class="mono">{{ formatPrice(o.total) }}</td>
+            </tr>
             </tbody>
           </table>
         </div>
       </div>
 
       <!-- ORDERS -->
-      <div *ngIf="activeTab()==='orders'">
-        <h2 class="admin-title">GESTIÓN DE PEDIDOS</h2>
-        <div class="admin-table-wrap">
-          <table class="admin-table">
-            <thead><tr><th>ID</th><th>Fecha</th><th>Items</th><th>Total</th></tr></thead>
-            <tbody>
-              <tr *ngFor="let o of orders.orders()">
-                <td class="mono neon-cyan">{{ o.id }}</td>
-                <td>{{ formatDate(o.date) }}</td>
-                <td class="mono">{{ o.items.length }} item(s)</td>
-                <td class="mono neon-yellow">{{ formatPrice(o.total) }}</td>
-
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
       <!-- USERS -->
       <div *ngIf="activeTab()==='users'">
-        <div class="admin-toolbar">
-          <h2 class="admin-title">GESTIÓN DE USUARIOS</h2>
-          <button class="btn btn-cyan btn-sm" (click)="openCreateForm()">+ Nuevo Usuario</button>
+        <h2 class="admin-title">GESTIÓN DE USUARIOS</h2>
+
+        <!-- Sub-tabs -->
+        <div class="subtab-bar">
+          <button class="as-link" [class.active]="userSubTab==='admins'" (click)="userSubTab='admins'">🛡️ Admins
+          </button>
+          <button class="as-link" [class.active]="userSubTab==='clientes'" (click)="userSubTab='clientes'">👤 Clientes
+          </button>
         </div>
 
-        <!-- Formulario crear/editar -->
-        <div class="user-form-card" *ngIf="showForm()">
-          <h3 class="admin-subtitle">{{ editingUser ? 'Editar Usuario' : 'Crear Nuevo Usuario' }}</h3>
-          <div class="user-form-grid">
-            <div class="form-group">
-              <label>Nombre completo</label>
-              <input class="input" [(ngModel)]="formName" placeholder="Juan García" />
-            </div>
-            <div class="form-group">
-              <label>Correo electrónico</label>
-              <input class="input" [(ngModel)]="formEmail" placeholder="juan@unishop.co" type="email" />
-            </div>
-            <div class="form-group">
-              <label>Contraseña</label>
-              <input class="input" [(ngModel)]="formPassword" placeholder="Mínimo 6 caracteres" type="password" />
-            </div>
-            <div class="form-group">
-              <label>Rol</label>
-              <select class="input" [(ngModel)]="formRole">
-                <option value="client">Cliente</option>
-                <option value="admin">Administrador</option>
-              </select>
-            </div>
+        <!-- Crear Admin -->
+        <div *ngIf="userSubTab==='admins'">
+
+          <h3 class="admin-subtitle">Admins registrados</h3>
+          <div *ngIf="loadingUsers" class="loading-msg">Cargando...</div>
+          <div class="admin-table-wrap" *ngIf="!loadingUsers">
+            <table class="admin-table">
+              <thead>
+              <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Código</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let a of admins">
+                <td class="mono neon-cyan">{{ a.id }}</td>
+                <td>{{ a.nombreUsuario }}</td>
+                <td class="mono">{{ a.codigoAdmin }}</td>
+
+              </tr>
+              <tr *ngIf="admins.length === 0">
+                <td colspan="4" style="text-align:center">Sin admins</td>
+              </tr>
+              </tbody>
+            </table>
           </div>
-          <div class="form-actions">
-            <button class="btn btn-cyan btn-sm" (click)="saveUser()">
-              {{ editingUser ? '💾 Guardar Cambios' : '✅ Crear Usuario' }}
-            </button>
-            <button class="btn btn-ghost btn-sm" (click)="cancelForm()">Cancelar</button>
-          </div>
-          <div class="form-error" *ngIf="formError">⚠️ {{ formError }}</div>
         </div>
 
-        <!-- Tabla usuarios -->
-        <div class="admin-table-wrap">
-          <table class="admin-table">
-            <thead>
-              <tr><th>ID</th><th>Nombre</th><th>Email</th><th>Rol</th><th>Fecha Registro</th><th>Acciones</th></tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let u of auth.users()">
-                <td class="mono">{{ u.id }}</td>
-                <td>{{ u.name }}</td>
-                <td class="mono" style="font-size:.82rem">{{ u.email }}</td>
+        <!-- Ver/Eliminar Clientes -->
+        <div *ngIf="userSubTab==='clientes'">
+          <h3 class="admin-subtitle">Usuarios (Clientes) registrados</h3>
+          <div class="admin-table-wrap">
+            <table class="admin-table">
+              <thead>
+              <tr>
+                <th>ID</th>
+                <th>Usuario</th>
+                <th>Correo</th>
+                <th>Acción</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let c of clientes">
+                <td class="mono neon-cyan">{{ c.id }}</td>
+                <td>{{ c.nombreUsuario }}</td>
+                <td>{{ c.correoElectronico }}</td>
                 <td>
-                  <span class="badge" [class.badge-magenta]="u.role==='admin'" [class.badge-cyan]="u.role==='client'">
-                    {{ u.role === 'admin' ? '👑 Admin' : '👤 Cliente' }}
-                  </span>
-                </td>
-                <td>{{ u.joinDate }}</td>
-                <td>
-                  <div class="act-btns">
-                    <button class="btn btn-ghost btn-sm" (click)="openEditForm(u)">✏️ Editar</button>
-                    <button class="btn btn-ghost btn-sm" style="color:var(--red)"
-                            (click)="deleteUser(u.id)"
-                            [disabled]="u.id === auth.user()?.id">
-                      🗑 Eliminar
-                    </button>
-                  </div>
+                  <button class="btn btn-danger btn-sm" (click)="deleteCliente(c.id)">🗑️ Eliminar</button>
                 </td>
               </tr>
-            </tbody>
-          </table>
+              <tr *ngIf="clientes.length === 0">
+                <td colspan="4" style="text-align:center">Sin usuarios</td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
