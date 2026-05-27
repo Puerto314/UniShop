@@ -4,7 +4,7 @@ import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AdminUser, ClienteUser } from '../models';
 
-const API = 'https://gpcueb.com/unishop';
+const API = 'https://gpcueb.org/unishop';
 
 @Injectable({ providedIn: 'root' })
 export class UserManagementService {

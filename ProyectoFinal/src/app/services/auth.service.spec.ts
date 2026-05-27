@@ -30,11 +30,11 @@ describe('AuthService', () => {
     });
 
     it('should not be logged in initially', () => {
-      expect(service.isLoggedIn()).toBeFalse();
+      expect(service.isLoggedIn()).toBeFalsy();
     });
 
     it('should not be admin initially', () => {
-      expect(service.isAdmin()).toBeFalse();
+      expect(service.isAdmin()).toBeFalsy();
     });
   });
 
@@ -42,7 +42,7 @@ describe('AuthService', () => {
     it('should set user and token on successful login', () => {
       service.loginBackend('testuser', '1234').subscribe();
 
-      const req = httpMock.expectOne('https://gpcueb.com/unishop/auth/login');
+      const req = httpMock.expectOne('https://gpcueb.org/unishop/auth/login');
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({
         nombreUsuario: 'testuser',
@@ -52,21 +52,21 @@ describe('AuthService', () => {
       req.flush({ token: 'abc123', nombreUsuario: 'testuser', rol: 'ROLE_USER' });
 
       expect(service.user()?.nombreUsuario).toBe('testuser');
-      expect(service.isLoggedIn()).toBeTrue();
-      expect(service.isAdmin()).toBeFalse();
+      expect(service.isLoggedIn()).toBeTruthy();
+      expect(service.isAdmin()).toBeFalsy();
     });
 
     it('should set isAdmin true when rol is ROLE_ADMIN', () => {
       service.loginBackend('admin', '1234').subscribe();
-      httpMock.expectOne('https://gpcueb.com/unishop/auth/login')
+      httpMock.expectOne('https://gpcueb.org/unishop/auth/login')
         .flush({ token: 'tok', nombreUsuario: 'admin', rol: 'ROLE_ADMIN' });
 
-      expect(service.isAdmin()).toBeTrue();
+      expect(service.isAdmin()).toBeTruthy;
     });
 
     it('should store token in sessionStorage', () => {
       service.loginBackend('u', 'p').subscribe();
-      httpMock.expectOne('https://gpcueb.com/unishop/auth/login')
+      httpMock.expectOne('https://gpcueb.org/unishop/auth/login')
         .flush({ token: 'mytoken', nombreUsuario: 'u', rol: 'ROLE_USER' });
 
       expect(service.getToken()).toBe('mytoken');
@@ -76,10 +76,11 @@ describe('AuthService', () => {
       service.loginBackend('bad', 'bad').subscribe({
         error: err => {
           expect(err.status).toBe(401);
+          // @ts-ignore
           done();
         }
       });
-      httpMock.expectOne('https://gpcueb.com/unishop/auth/login')
+      httpMock.expectOne('https://gpcueb.org/unishop/auth/login')
         .flush({ error: 'Credenciales inválidas' }, { status: 401, statusText: 'Unauthorized' });
     });
   });
@@ -87,13 +88,13 @@ describe('AuthService', () => {
   describe('logout()', () => {
     it('should clear user and token', () => {
       service.loginBackend('u', 'p').subscribe();
-      httpMock.expectOne('https://gpcueb.com/unishop/auth/login')
+      httpMock.expectOne('https://gpcueb.org/unishop/auth/login')
         .flush({ token: 'tok', nombreUsuario: 'u', rol: 'ROLE_USER' });
 
       service.logout();
 
       expect(service.user()).toBeNull();
-      expect(service.isLoggedIn()).toBeFalse();
+      expect(service.isLoggedIn()).toBeFalsy();
       expect(service.getToken()).toBeNull();
     });
   });
@@ -101,7 +102,7 @@ describe('AuthService', () => {
   describe('enviarCodigo()', () => {
     it('should POST to /auth/enviar-codigo', () => {
       service.enviarCodigo('user', 'pass', 'user@gmail.com').subscribe();
-      const req = httpMock.expectOne('https://gpcueb.com/unishop/auth/enviar-codigo');
+      const req = httpMock.expectOne('https://gpcueb.org/unishop/auth/enviar-codigo');
       expect(req.request.method).toBe('POST');
       expect(req.request.body).toEqual({
         nombreUsuario: 'user',
@@ -115,7 +116,7 @@ describe('AuthService', () => {
   describe('verificarYRegistrar()', () => {
     it('should POST to /auth/verificar-y-registrar', () => {
       service.verificarYRegistrar('user', 'pass', 'user@gmail.com', '123456').subscribe();
-      const req = httpMock.expectOne('https://gpcueb.com/unishop/auth/verificar-y-registrar');
+      const req = httpMock.expectOne('https://gpcueb.org/unishop/auth/verificar-y-registrar');
       expect(req.request.method).toBe('POST');
       expect(req.request.body.codigo).toBe('123456');
       req.flush({});
