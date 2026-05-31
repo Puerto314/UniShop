@@ -19,90 +19,87 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthFilter;
-    private final UserDetailsService userDetailsService;
+	private final JwtAuthenticationFilter jwtAuthFilter;
+	private final UserDetailsService userDetailsService;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, UserDetailsService userDetailsService) {
-        this.jwtAuthFilter = jwtAuthFilter;
-        this.userDetailsService = userDetailsService;
-    }
+	public SecurityConfig(JwtAuthenticationFilter jwtAuthFilter, UserDetailsService userDetailsService) {
+		this.jwtAuthFilter = jwtAuthFilter;
+		this.userDetailsService = userDetailsService;
+	}
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http,
-                                                   CorsConfigurationSource corsConfigurationSource) throws Exception {
-        http
-            .cors(cors -> cors.configurationSource(corsConfigurationSource))
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                // Rutas públicas
-                .requestMatchers("/auth/**").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfigurationSource corsConfigurationSource)
+			throws Exception {
+		http.cors(cors -> cors.configurationSource(corsConfigurationSource)).csrf(csrf -> csrf.disable())
+				.authorizeHttpRequests(auth -> auth
+						// Rutas públicas
+						.requestMatchers("/auth/**").permitAll()
+						.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
 
-                // Solo admins gestionan admins
-                .requestMatchers("/admin/**").hasRole("ADMIN")
+						// Solo admins gestionan admins
+						.requestMatchers("/admin/**").hasRole("ADMIN")
 
-                // Ver clientes
-                .requestMatchers(HttpMethod.GET, "/cliente/mostrartodo").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.GET, "/cliente/buscar/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/cliente/**").hasRole("ADMIN")
+						// Ver clientes
+						.requestMatchers(HttpMethod.GET, "/cliente/mostrartodo").hasAnyRole("USER", "ADMIN")
+						.requestMatchers(HttpMethod.GET, "/cliente/buscar/**").hasAnyRole("USER", "ADMIN")
+						.requestMatchers("/cliente/**").hasRole("ADMIN")
 
-                // Productos
-                .requestMatchers(HttpMethod.GET, "/producto/**").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/producto/**").hasRole("ADMIN")
+						// Productos
+						.requestMatchers(HttpMethod.GET, "/producto/**").hasAnyRole("USER", "ADMIN")
+						.requestMatchers("/producto/**").hasRole("ADMIN")
 
-                // ── Órdenes de compra ────────────────────────────────────────
-                // Crear pedido y ver los propios: USER o ADMIN
-                .requestMatchers(HttpMethod.POST, "/ordenes").hasAnyRole("USER", "ADMIN")
-                .requestMatchers(HttpMethod.GET,  "/ordenes/mias").hasAnyRole("USER", "ADMIN")
-                // Ver TODOS los pedidos: solo ADMIN
-                .requestMatchers(HttpMethod.GET,  "/ordenes/todas").hasRole("ADMIN")
+						// ── Órdenes de compra ────────────────────────────────────────
+						// Crear pedido y ver los propios: USER o ADMIN
+						.requestMatchers(HttpMethod.POST, "/ordenes").hasAnyRole("USER", "ADMIN")
+						.requestMatchers(HttpMethod.GET, "/ordenes/mias").hasAnyRole("USER", "ADMIN")
+						// Ver TODOS los pedidos: solo ADMIN
+						.requestMatchers(HttpMethod.GET, "/ordenes/todas").hasRole("ADMIN")
 
-                .anyRequest().authenticated()
-            )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+						.anyRequest().authenticated())
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.authenticationProvider(authenticationProvider())
+				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+		return http.build();
+	}
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of(
-            "http://localhost:4200",
-            "http://localhost:8080"
-        ));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
-        config.setExposedHeaders(List.of("Authorization"));
+	@Bean
+	public CorsConfigurationSource corsConfigurationSource() {
+		CorsConfiguration configuration = new CorsConfiguration();
+		configuration.setAllowedOrigins(
+				Arrays.asList("http://localhost:4200", "https://unishopueb.netlify.app", "https://gpcueb.org"));
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+		configuration.setAllowedHeaders(Arrays.asList("*"));
+		configuration.setExposedHeaders(Arrays.asList("Authorization"));
+		configuration.setAllowCredentials(true);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
-    }
+		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		source.registerCorsConfiguration("/**", configuration);
+		return source;
+	}
 
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
+	@Bean
+	public AuthenticationProvider authenticationProvider() {
+		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(userDetailsService);
+		authProvider.setPasswordEncoder(passwordEncoder());
+		return authProvider;
+	}
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
+	@Bean
+	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+		return config.getAuthenticationManager();
+	}
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
 }

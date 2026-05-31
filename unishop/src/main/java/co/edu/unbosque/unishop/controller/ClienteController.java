@@ -12,7 +12,6 @@ import co.edu.unbosque.unishop.service.ClienteService;
 
 @RestController
 @RequestMapping("/cliente")
-@CrossOrigin(origins = { "http://localhost:4200", "http://localhost:8080" })
 public class ClienteController {
 
     @Autowired

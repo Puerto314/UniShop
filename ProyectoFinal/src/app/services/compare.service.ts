@@ -7,7 +7,7 @@ import { AmazonProduct, AmazonReview, BuscarResponse } from '../models';
 @Injectable({ providedIn: 'root' })
 export class CompareService {
 
-  private readonly API = 'http://localhost:8080';
+  private readonly API = 'https://gpcueb.org/unishop';
 
   readonly loading        = signal(false);
   readonly loadingReviews = signal(false);
@@ -35,7 +35,7 @@ export class CompareService {
     ).pipe(
       catchError(err => {
         this.error.set(
-          'Error al conectar con el servidor. Verifica que el backend esté corriendo en localhost:8080.'
+          'Error al conectar con el servidor. Verifica que el backend esté corriendo en gpcueb.org/unishop.'
         );
         console.error(err);
         return of({ amazon: [] } as BuscarResponse);

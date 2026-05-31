@@ -4,7 +4,7 @@ import {Observable, tap} from 'rxjs';
 import {Order, CartItem} from '../models';
 import {AuthService} from './auth.service';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = 'https://gpcueb.org/unishop';
 
 /** Shape que devuelve el backend */
 interface OrdenBackend {
